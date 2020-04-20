@@ -8,12 +8,31 @@ Rejected
 
 ## Context
 
-Core developers are using JS maps files to keep all the selectors they need to interact with the BO theme.
-QA team is keeping their own set of selectors to interact with during automated tests.
+Core developers are using JS maps files to keep all the selectors they need to interact with the BO theme. Here is an example of such a file:
+
+```
+export default {
+  mainDiv: '#order-view-page',
+  orderPaymentDetailsBtn: '.js-payment-details-btn',
+  orderPaymentFormAmountInput: '#order_payment_amount',
+  orderPaymentInvoiceSelect: '#order_payment_id_invoice',
+  viewOrderPaymentsBlock: '#view_order_payments_block',
+  privateNoteToggleBtn: '.js-private-note-toggle-btn',
+  privateNoteBlock: '.js-private-note-block'
+}
+```
+
+QA team is keeping their own set of selectors to interact with during automated tests. Here is an example of such a file:
+
+```
+this.documentTab = 'a#orderDocumentsTab';
+this.documentsTableDiv = '#orderDocumentsTabContent';
+this.documentsTableRow = `${this.documentsTableDiv} table tbody tr:nth-child(%ROW)`;
+this.documentNumberLink = `${this.documentsTableRow} td:nth-child(3) a`;
+this.documentName = `${this.documentsTableRow} td:nth-child(2)`;
+```
+
 Selectors should be mutualized so that when a dev changes a UI component or update a selector, the changes are reflected in the corresponding JS Map file and automated tests using this selector will keep working as intented without human intervention.
-
-
-The issue motivating this decision, and any context that influences or constrains the decision.
 
 ## Decision
 
