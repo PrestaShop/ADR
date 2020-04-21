@@ -10,8 +10,8 @@ In discussion
 
 As of today (v1.7.7) PrestaShop allows a few advanced features for Symfony developers, among which:
 - automatic require of `vendor/autoload.php`
-- possibility to define services for front AND for admin
-- possibility to use Doctrine entities
+- possibility to define services for front AND for admin using [Symfony container](https://symfony.com/doc/current/service_container.html)
+- possibility to use [Doctrine](https://symfony.com/doc/current/doctrine.html) entities
 
 However there is a limitation to all these features they are managed based on the **installed modules** list which is built at the kernel booting.
 
@@ -24,10 +24,10 @@ Although workaround and alternatives exist, this is not acceptable as we want to
 
 ## Autoload and Doctrine solution
 
-These are the two easier to deal with, a solution has already been proposed in this PR https://github.com/PrestaShop/PrestaShop/pull/17706 which could be split for those two issues.
+These are the two easier to deal with, a solution has already been proposed in this PR [PrestaShop/PrestaShop#17706](https://github.com/PrestaShop/PrestaShop/pull/17706) which could be split for those two issues.
 It also includes an helper class/service that would allow to easily update the database schema based on Doctrine.
 
-## Container's solution
+## Container solutions
 
 A few solutions have been imagined and discussed, here are the three main possibilities along with their advantages and drawbacks.
 
