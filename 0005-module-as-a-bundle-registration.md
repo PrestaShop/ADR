@@ -1,4 +1,4 @@
-# 4. Registration of a bundle-like module 
+# 5. Registration of a bundle-like module 
 
 Date: 2020-02-13
 
