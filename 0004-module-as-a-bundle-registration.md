@@ -74,3 +74,18 @@ Indexing the generated array by the module name allow us to don't load bundles o
 ## Points of friction
 
 The module developer must be careful about the third-party bundles he use. If a component is already used by the Prestashop Core, the module one will be used (because it is loaded last) and that can lead to unpredicted behaviours. (@TODO test this assert).
+
+
+## Votes by maintainers
+
+|                   | Yes | NO |
+|-------------------|-----|----|
+| @Progi1984        |     |    |
+| @sowbiba          | X   |    |
+| @jolelievre       |     |    |
+| @matthieu-rolland |     |    |
+| @matks            |     |    |
+| @PierreRambaud    |     |    |
+| @eternoendless    |     |    |
+| @atomiix          |     |    |
+| @NeOMaking        |     |    |
