@@ -72,7 +72,7 @@ What becomes easier :
 - As a module developer, you'll be able to use every global javascript features of the core (if they are exposed inside the window object)
 - As a module developer, you're no longer forced to use hard paths breaking your dev environment or CI/CD workflow
 - As a core developer, you're no longer forced to import every modules you need, if they are exposed in the window object, you'll be able to use them directly
-- We now provide a way to avoid multiple executions of the same feature, while before, every modules was using them as they wants without caring of others modules. It means that we'll maybe avoid some side effects on some features.
+- We now provide a way to avoid multiple executions of the same feature, while before, every modules was using them as they wants without caring of other modules. It means that we'll maybe avoid some side effects on some features.
 - Modules will be able to override core components without breaking the shop update workflow
 
 What could become harder :
