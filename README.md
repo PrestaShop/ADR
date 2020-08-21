@@ -28,4 +28,5 @@ ADR ID | Date | Discussion | Title | Status
 0004   | 2020-04-17 | ~ | [Keep QA and Devs HTML selectors separate](0004-keep-qa-and-devs-html-selectors-separate.md) | ❌ Rejected
 0005   | 2019-01-22 | [#1](https://github.com/PrestaShop/ADR/pull/1) | Define ACL rules for Symfony pages | 💬 In discussion
 0006   | 2020-02-13 | [#7](https://github.com/PrestaShop/ADR/pull/7) | Registration of a bundle-like module | 💬 In discussion
-0007   | 2020-03-09 | [#8](https://github.com/PrestaShop/ADR/pull/7) | Module advanced installation | 💬 In discussion
+0007   | 2020-03-09 | [#8](https://github.com/PrestaShop/ADR/pull/8) | Module advanced installation | 💬 In discussion
+0008   | 2020-03-23 | [#9](https://github.com/PrestaShop/ADR/pull/9) | Ajax error handling | 💬 In discussion
