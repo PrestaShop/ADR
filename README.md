@@ -14,7 +14,7 @@ To learn more about ADRs, read [this article][adr]
 
 Use [ADR tools](https://github.com/npryce/adr-tools/) to build your proposal, add it to the status table below, then submit a Pull Request.
 
-New proposals' start as "In discussion". If the subject is accepted for discussion, it is assigned an ID and added to the table below.
+New proposals initial status is "In discussion". If the subject is accepted for discussion, it is assigned an ID and added to the table below.
 
 Once the discussion is over and after all necessary ADR modifications, a vote is cast in the related Pull Request. All project maintainers vote, and their vote is registered. Decisions are accepted by simple majority. Discussed ADRs are merged even if they are not accepted.
 
