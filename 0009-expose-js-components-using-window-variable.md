@@ -1,4 +1,4 @@
-# 5. Expose js modules using window variable
+# 9. Expose js components using window variable
 
 Date: 2020-08-20
 
