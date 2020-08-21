@@ -1,10 +1,10 @@
-# 2. Define ACL rules for Symfony pages
+# 5. Define ACL rules for Symfony pages
 
 Date: 2019-01-22
 
 ## Status
 
-Accepted
+In discussion
 
 ## Context
 
