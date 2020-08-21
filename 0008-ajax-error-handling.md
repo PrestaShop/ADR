@@ -1,4 +1,4 @@
-# 6. Ajax error handling
+# 8. Ajax error handling
 
 Date: 2020-03-23
 
