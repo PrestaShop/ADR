@@ -8,8 +8,7 @@ In discussion
 
 ## Context
 
-The issue motivating this decision, and any context that influences or constrains the decision.
-Modules are unable to use translatable type without using hardlinks such as :
+Modules are unable to use translatable type without using hardlinks such as:
 
 ```
 import TranslatableInput from '../../../../../admin-dev/themes/new-theme/js/components/translatable-input';
@@ -19,7 +18,7 @@ This path is making CI/CD harder, and also break on some development environment
 
 ## Decision
 
-The idea would be to give them the possibility to initialize TranslatableInput using a global objet such as `window.prestashop.components.TranslatableInput.init()`.
+Reusable components in BO will be available globally in `window.prestashop.components`, like this: `window.prestashop.components.TranslatableInput.init()`.
 
 This means that if they are already initiated, they need to avoid a new execution.
 
@@ -61,7 +60,7 @@ $(() => {
 });
 ```
 
-based on a little POC, which was mainly a proof of concept : [20313](https://github.com/PrestaShop/PrestaShop/pull/20313)
+based on a little POC: [20313](https://github.com/PrestaShop/PrestaShop/pull/20313)
 
 This means that we'll have to refacto a lot of javascripts in order to port every components into globals, or at least begin by mosts used ones.
 
