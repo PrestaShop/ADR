@@ -4,7 +4,7 @@ Date: 2020-08-20
 
 ## Status
 
-Ready for vote
+Accepted
 
 ## Context
 
