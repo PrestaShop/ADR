@@ -29,7 +29,7 @@ All PrestaShop components will be bundled together and made available in all pag
 
 The namespace will contain classes like this `prestashop.component.SomeComponent`. If you want to get a new instance of `SomeComponent`, you call `new prestashop.component.SomeComponent(...params)`
 
-3. Reusable components will be available as initialized instances through `window.prestashop.instance`. These instances are initialized with default parameters.
+3. Reusable components will be available as initialized instances through `window.prestashop.instance`. These instances are initialized with default parameters by the `initComponents` function.
 
 4. A function `initComponent` available through `prestashop.component` is responsible for building `window.prestashop.instance`.
 
