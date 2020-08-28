@@ -37,7 +37,7 @@ The namespace will contain classes like this `prestashop.component.SomeComponent
 
 Since you have access to both constructors and components, developers are free to choose how to initialize and control their components.
 
-If you don't want to initialize a given component with default parameters, you can always call new `prestashop.component.SomeComponent(...myOwnParameters)`.
+If you don't want to initialize a given component with default parameters, you can always call `new prestashop.component.SomeComponent(...myOwnParameters)`.
 
 If you need to apply some mutation to an already initialized component, you just get the global instance: `prestashop.instance.someComponent.doSomething(...)`.
 
