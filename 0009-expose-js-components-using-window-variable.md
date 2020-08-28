@@ -4,65 +4,47 @@ Date: 2020-08-20
 
 ## Status
 
-In discussion
+Ready for vote
 
 ## Context
 
-Modules are unable to use translatable type without using hardlinks such as:
+In order for modules to use JavaScript components from the Core, they need to import them using statements like:
 
 ```
+// in order to use translatable type
 import TranslatableInput from '../../../../../admin-dev/themes/new-theme/js/components/translatable-input';
 ```
 
-This path is making CI/CD harder, and also break on some development environment such as symlinks or containers.
+This path is not robust, makes CI/CD harder, and also is not compatible with some development environments using symlinks or containers.
 
 ## Decision
 
-Reusable components in BO will be available globally in `window.prestashop.components`, like this: `window.prestashop.components.TranslatableInput.init()`.
+We have decided about a system which resolves in 4 concepts:
 
-This means that if they are already initiated, they need to avoid a new execution.
+1. Reusable components in BO will be available globally through `window.prestashop` (name can still be modified in short term).
 
-Currently, the `prestashop` object is not used in the BO, but as we want to stick to the workflow used on FO, we would like to introduce it in the backoffice.
+All PrestaShop components will be bundled together and made available in all pages using this mean. Each controller decides which components it chooses to initialize.
 
-@JevgenijVisockij submited a way of initializing global objects :
+2. Reusable components will be available as a namespace `window.prestashop.component`.
 
-```
-const initComponents = () => {
-  let translatableInput = null;
-  window.prestashop = {
-    components: {
-      translatableInput: {
-        init() {
-          if (translatableInput === null) {
-            translatableInput = new TranslatableInput();
-          }
-          return translatableInput;
-        },
-      },
-    }
-  }
-}
-```
+The namespace will contain classes like this `prestashop.component.SomeComponent`. If you want to get a new instance of `SomeComponent`, you call new `prestashop.component.SomeComponent(...params)`
 
-and used like :
+3. Reusable components will be available as initialized instances through `window.prestashop.instance`. These instances are initialized with default parameters.
 
-```
-$(() => {
-    window.prestashop.components.translatableInput.init();
-});
-```
+4. A function `initComponent` available through `prestashop.component` is responsible for building `window.prestashop.instance`.
 
-and maybe you could get the possibility to access to the component directly like :
+### Why a namespace and a collection of instances
 
-```
-$(() => {
-    new window.prestashop.components.translatableInput.component({localeItemSelector: '.my-selector'});
-});
-```
+Since you have access to both constructors and components, developers are free to choose how to initialize and control their components.
 
-based on a little POC: [20313](https://github.com/PrestaShop/PrestaShop/pull/20313)
+If you don't want to initialize a given component with default parameters, you can always call new `prestashop.component.SomeComponent(...myOwnParameters)`.
 
-This means that we'll have to refacto a lot of javascripts in order to port every components into globals, or at least begin by mosts used ones.
+If you need to apply some mutation to an already initialized component, you just get the global instance: `prestashop.instance.someComponent.doSomething(...)`.
+
+
+## First implementation
+
+To be completed once we have validated the related PR https://github.com/PrestaShop/PrestaShop/pull/20591
 
 ## Consequences
 
