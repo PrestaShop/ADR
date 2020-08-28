@@ -30,4 +30,4 @@ ADR ID | Date | Discussion | Title | Status
 0006   | 2020-02-13 | [Pull Request](https://github.com/PrestaShop/ADR/pull/7) | Registration of a bundle-like module | 💬 In discussion
 0007   | 2020-03-09 | [Pull Request](https://github.com/PrestaShop/ADR/pull/8) | Module advanced installation | 💬 In discussion
 0008   | 2020-03-23 | [Pull Request](https://github.com/PrestaShop/ADR/pull/9) | Ajax error handling | 💬 In discussion
-0009   | 2020-03-23 | [Pull Request](https://github.com/PrestaShop/ADR/pull/12) | Expose js components using window variable | 💬 In discussion
+0009   | 2020-08-20 | ~ | [Expose js components using window variable](https://github.com/PrestaShop/ADR/blob/master/0009-expose-js-components-using-window-variable.md) | ✅ Accepted
