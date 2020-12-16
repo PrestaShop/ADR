@@ -44,35 +44,42 @@ I believe that, beyond SemVer, people attach "meaning" to patch/minor/major vers
 
 ## Decision
 
-I suggest to apply the following rule:
+I have 3 candidates for a rule, the 3rd one was suggested by @PierreRambaud .
+
+Note that I consider
+- a PrestaShop core bump 1.7.6.2 => 1.7.6.4 is a patch bump
+- a PrestaShop core bump 1.7.6.2 => 1.7.7.0 is a minor bump
+- a PrestaShop core bump 1.7.6.2 => 1.8.0.0 is a major bump
+
+I ignore the "1." in front of PrestaShop versions.
+
+### Candidate 1 : bump to major when Core minimum version is bumped to minor
 
 WHEN a new module version requires to bump the PrestaShop minimum version,
 
-IF the bump is patch (ex: PS 1.7.6.2 => 1.7.6.4)
-THEN the module version must be bumped to at least the next minor version
+IF the core bump is a patch bump (ex: PS 1.7.6.2 => 1.7.6.4)
+THEN the module version must be bumped to at least the next minor version (ex: ps_searchbar 2.0.1 => 2.2.0)
 
-IF the bump is minor or major
-THEN the module version must be bumped to at least the next major version
+IF the bump is minor or major (ex: PS 1.7.6.2 => 1.7.7.0)
+THEN the module version must be bumped to at least the next major version (ex: ps_searchbar 2.0.1 => 3.0.0)
 
-<hr>
-
-That would mean, for module A who bumps PS minimum version from PS 1.7.6 to PS 1.7.7, the new version must be a major version.
-
-## Alternative solution
-
-An alternative solution is to be a little more flexible:
+### Candidate 2 : bump to minor when Core minimum version is bumped to minor
 
 WHEN a new module version requires to bump the PrestaShop minimum version,
 
-IF the bump is patch (ex: PS 1.7.6.2 => 1.7.6.4)
-THEN the module version must be bumped to at least the next patch version
+IF the core bump is a patch bump (ex: PS 1.7.6.2 => 1.7.6.4)
+THEN the module version must be bumped to at least the next patch version (ex: ps_searchbar 2.0.1 => 2.0.2)
 
-IF the bump is minor
-THEN the module version must be bumped to at least the next minor version
+IF the bump is minor (ex: PS 1.7.6.2 => 1.7.7.0)
+THEN the module version must be bumped to at least the next minor version (ex: ps_searchbar 2.0.1 => 2.1.0)
 
-IF the bump is major
-THEN the module version must be bumped to at least the next major version
+IF the bump is major (ex: PS 1.7.6.2 => 1.8.0.0)
+THEN the module version must be bumped to at least the next major version (ex: ps_searchbar 2.0.1 => 3.0.0)
 
-<hr>
+### Candidate 3 : bump to major when Core minimum version is bumped to minor AND stop using SemVer for modules
 
-That would mean, for module A who bumps PS minimum version from PS 1.7.6 to PS 1.7.7, the new version must be a minor version.
+Suggested by @PierreRambaud : this candidate is identical to the 1st candidate but also suggests to stop following SemVer for module versions.
+
+SemVer is good because it helps users understand whether the project introduces Breaking Changes or not. But we are not sure PrestaShop community extends our modules, and backward compatibility is interesting for modules only if the module is extended or reused.
+
+@PierreRambaud suggests to stop using SemVer for modules and modify upon release the version number according to the type of changes introduced: bug fixes (patch), or new features (minor), or important changes (major).
