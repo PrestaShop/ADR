@@ -22,7 +22,7 @@ To learn more about ADRs, read [this article][adr].
 
 
 ADR ID | Date       | Discussion           | Title                                                | Status
------- | -----------| -------------------- | --------------------------------------------------- -| -----------------
+------ | -----------| -------------------- | -----------------------------------------------------| -----------------
 0001   | 2019-01-22 | ~                    | [Record architecture decisions][0001]                | ✅ Accepted
 0002   | 2019-02-15 | ~                    | [Mixed use of composer and zip modules][0002]        | ✅ Accepted
 0003   | 2019-10-15 | ~                    | [Use of autowiring][0003]                            | ❌ Rejected
