@@ -33,3 +33,7 @@ What becomes easier :
 - It's easier to refactor
 - When all configuration names are in one place, it's easier to fine one you are looking for
 - Allows deprecating configurations
+
+What becomes harder :
+- You need to include(use or require) Configuration class everywhere, you want to use Configurations
+- Need to replace Configuration names with constants for this to be useful, which will require some work and testing
