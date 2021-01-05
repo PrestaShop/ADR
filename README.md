@@ -33,6 +33,7 @@ ADR ID | Date       | Discussion           | Title                              
 0008   | 2020-03-23 | [Pull Request][0008] | Ajax error handling                                  | 💬 In discussion
 0009   | 2020-08-20 | ~                    | [Expose js components using window variable][0009]   | ✅ Accepted
 0010   | 2020-12-15 | [Pull Request][0010] | Module version bump convention when Core is updated  | 💬 In discussion
+0011   | 2021-01-05 | [Pull Request][0011] | Use constants for configuration variables            | 💬 In discussion
 
 
 
@@ -48,3 +49,4 @@ ADR ID | Date       | Discussion           | Title                              
 [0008]: https://github.com/PrestaShop/ADR/pull/9
 [0009]: 0009-expose-js-components-using-window-variable.md
 [0010]: https://github.com/PrestaShop/ADR/pull/14
+[0011]: https://github.com/PrestaShop/ADR/pull/16
