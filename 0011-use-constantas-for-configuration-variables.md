@@ -8,13 +8,27 @@ In discussion
 
 ## Context
 
-Configuration names in PrestaShop are used as hardcoded strings. It makes it harder to figure out 
-which configurations are available, also leaves possibility for mistyping configuration name without noticing.
+Configuration names in PrestaShop are used as hardcoded strings.
+For example:
+    
+    PS_SSL_ENABLED
+    PS_SHOP_ENABLE
+ 
+It makes it harder to figure out which configurations are available, also leaves possibility for mistyping configuration name without noticing.
+
+If some Configuration is no longer used, there is no proper process to deprecated it, leading to configurations like 
+
+    PS_CONFIGURATION_AGREMENT 
+
+cluttering database, but not having any actual use.  
 
 ## Decision
 
-Use constants in Configuration class to define all the configuration names and then use them in code instead of plain strings.
- 
+Use constants in Configuration class to define all the configuration names and then use them in code instead of plain strings. 
+So in code we would have `Configuration::updateValue(Configuration::PS_SSL_ENABLED, 1);` instead of `Configuration::updateValue('PS_SSL_ENABLED', 1);`
+
+This would also allow for you to have a documentation of sorts for configuration names, by having them all in one place.
+
 ### Why use Configuration class
 It already exists for all purposes concerning usage of configurations. Creation of the new class just to store
 constants is not worthwhile in this case.
@@ -33,6 +47,7 @@ What becomes easier :
 - It's easier to refactor
 - When all configuration names are in one place, it's easier to fine one you are looking for
 - Allows deprecating configurations
+- Allows to document Configurations in code
 
 What becomes harder :
 - You need to include(use or require) Configuration class everywhere, you want to use Configurations
