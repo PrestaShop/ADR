@@ -8,15 +8,15 @@ In discussion
 
 ## Context
 
-Configuration names in PrestaShop currently are just hardcoded. It makes it harder to figure out 
+Configuration names in PrestaShop are used as hardcoded strings. It makes it harder to figure out 
 which configurations are available, also leaves possibility for mistyping configuration name without noticing.
 
 ## Decision
 
-Use constants in Configuration class to define all the configuration names.
+Use constants in Configuration class to define all the configuration names and then use them in code instead of plain strings.
  
 ### Why use Configuration class
-It's already exists for all purposes concerning usage of configurations and creation of the new class just to store
+It already exists for all purposes concerning usage of configurations. Creation of the new class just to store
 constants is not worthwhile in this case.
 
 ## First implementation
