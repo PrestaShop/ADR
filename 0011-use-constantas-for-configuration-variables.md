@@ -21,7 +21,8 @@ constants is not worthwhile in this case.
 
 ## First implementation
 
-Will update once PR to PrestaShop is created
+https://github.com/PrestaShop/PrestaShop/pull/22672
+
 ## Consequences
 
 What becomes easier :
