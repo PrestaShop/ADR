@@ -1,4 +1,4 @@
-# 12. Use TypeScript on the project
+# 13. Use TypeScript on the project
 
 Date: 2021-02-25
 
