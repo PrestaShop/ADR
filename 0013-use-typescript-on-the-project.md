@@ -14,7 +14,7 @@ What would benefit the project of using it :
 - Detect bugs before sending PRs, TypeScript users say that globally, it allows to detect around 15% of bugs that you would detect by testing.
 - Use latest features such as Optional Chaining, Tuples and Records... really early.
 - Types are increasing the quality of the project, because we would be able to detect dangerous changes, related bugs... If we use it on PHP side, why don't we use types while using JS ?
-- Vue 3 offered a new API : Composition API, this one is pretty easy to use with TypeScript as it's mainly functional programming instead of opiniated APIs of Vue, that would be a good moove to preshot the Vue update in the BO.
+- Vue 3 offered a new API : Composition API, this one is pretty easy to use with TypeScript as it's mainly functional programming instead of opiniated APIs of Vue, that would be a good move to preshot the Vue update in the BO.
 
 ## Decision
 
