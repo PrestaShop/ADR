@@ -28,8 +28,8 @@ Benefits:
 
 [Please, take a look at this proof of concept](https://github.com/PrestaShop/PrestaShop/pull/25909), some tax ratios calculations are split into a helper folder, using functional programming (because it's easier to understand the data flow: You have some data going in, you have some data going out, which is not the case of class programming in general because it's a more complex paradigm). And I added a unit test example using the helper. This unit test was impossible to be written with the class method, without having a complex virtual dom system.
 
-Some propositions:
-- Always use the same folder containing helpers, but we have to decide if the folder is global, or inside every page/component.
+What should we do:
+- Use a global folder containing helpers with a relative path, they are designed to be reusable and as we are speaking about functional programming, the helper should not modify any software state, it's a basic I/O function that take some params and returns some data.
 - Use functional programming, because it's more performing and doesn't require object logic.
 - Every helper requires a unit test to be written to accept a pull request.
 
