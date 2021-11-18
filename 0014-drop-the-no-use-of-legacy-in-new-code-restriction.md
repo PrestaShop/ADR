@@ -28,7 +28,7 @@ The following decision applies to both `Core` and `PrestaShopBundle` classes (re
 
     - Core classes MAY access to data provided by static classes or methods static classes by relying on dedicated services (Application services, Repositories, Data Providers...).
 
-3. **Core classes MUST NOT reimplement code found in legacy classes**, without deprecating the original method/class (and optionally, making it rely on the new implementation(.
+3. **Core classes MUST NOT reimplement code found in legacy classes**, without deprecating the original method/class (and optionally, making it rely on the new implementation).
 
 4. **The Adapter namespace MUST be phased out** eventually:
 
