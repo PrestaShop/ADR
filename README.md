@@ -34,7 +34,7 @@ ADR ID | Date       | Discussion           | Title                              
 0009   | 2020-08-20 | ~                    | [Expose js components using window variable][0009]   | ✅ Accepted
 0010   | 2020-12-15 | [Pull Request][0010] | Module version bump convention when Core is updated  | 💬 In discussion
 0011   | 2021-01-05 | [Pull Request][0011] | Use constants for configuration variables            | 💬 In discussion
-0014   | 2021-08-25 | ~ | Drop the "No Use Of Legacy In New Code" restriction | 💬 In discussion
+0014   | 2021-08-25 | ~                    | [Drop the "No Use Of Legacy In New Code" restriction][0014] | ✅ Accepted
 
 
 
@@ -51,3 +51,4 @@ ADR ID | Date       | Discussion           | Title                              
 [0009]: 0009-expose-js-components-using-window-variable.md
 [0010]: https://github.com/PrestaShop/ADR/pull/14
 [0011]: https://github.com/PrestaShop/ADR/pull/16
+[0014]: 0014-drop-the-no-use-of-legacy-in-new-code-restriction.md
