@@ -80,7 +80,7 @@ instead of
 
 It allows to type without creating a DTO for a simple collection !
 
-"Magie du Pestacle !!!"
+"Magie du Pestacle !!!" => "show magic"
 
 
 ## Decision
