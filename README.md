@@ -21,20 +21,20 @@ To learn more about ADRs, read [this article][adr].
 ## ADR status
 
 
-ADR ID | Date       | Discussion           | Title                                                | Status
------- | -----------| -------------------- | -----------------------------------------------------| -----------------
-0001   | 2019-01-22 | ~                    | [Record architecture decisions][0001]                | ✅ Accepted
-0002   | 2019-02-15 | ~                    | [Mixed use of composer and zip modules][0002]        | ✅ Accepted
-0003   | 2019-10-15 | ~                    | [Use of autowiring][0003]                            | ❌ Rejected
-0004   | 2020-04-17 | ~                    | [Keep QA and Devs HTML selectors separate][0004]     | ❌ Rejected
-0005   | 2019-01-22 | [Pull Request][0005] | Define ACL rules for Symfony pages                   | 💬 In discussion
-0006   | 2020-02-13 | [Pull Request][0006] | Registration of a bundle-like module                 | 💬 In discussion
-0007   | 2020-03-09 | [Pull Request][0007] | Module advanced installation                         | 💬 In discussion
-0008   | 2020-03-23 | [Pull Request][0008] | Ajax error handling                                  | 💬 In discussion
-0009   | 2020-08-20 | ~                    | [Expose js components using window variable][0009]   | ✅ Accepted
-0010   | 2020-12-15 | [Pull Request][0010] | Module version bump convention when Core is updated  | 💬 In discussion
-0011   | 2021-01-05 | [Pull Request][0011] | Use constants for configuration variables            | 💬 In discussion
-0014   | 2021-08-25 | [Pull Request][0014] | Drop the "No Use Of Legacy In New Code" restriction  | ✅ Accepted
+ADR ID | Date       | Discussion           | Title                                                        | Status
+------ | -----------| -------------------- | -------------------------------------------------------------| -----------------
+0001   | 2019-01-22 | ~                    | [Record architecture decisions][0001]                        | ✅ Accepted
+0002   | 2019-02-15 | ~                    | [Mixed use of composer and zip modules][0002]                | ✅ Accepted
+0003   | 2019-10-15 | ~                    | [Use of autowiring][0003]                                    | ❌ Rejected
+0004   | 2020-04-17 | ~                    | [Keep QA and Devs HTML selectors separate][0004]             | ❌ Rejected
+0005   | 2019-01-22 | ~                    | [Define ACL rules for Symfony pages][0005]                   | ❌ Abandoned
+0006   | 2020-02-13 | ~                    | [Registration of a bundle-like module][006]                  | ❌ Abandoned
+0007   | 2020-03-09 | [Pull Request][0007] | Module advanced installation                                 | 💬 In discussion
+0008   | 2020-03-23 | ~                    | [Ajax error handling][0008]                                  | ❌ Abandoned
+0009   | 2020-08-20 | ~                    | [Expose js components using window variable][0009]           | ✅ Accepted
+0010   | 2020-12-15 | ~                    | [Module version bump convention when Core is updated][0010]  | ❌ Abandoned
+0011   | 2021-01-05 | ~                    | [Use constants for configuration variables][0011]            | ❌ Abandoned
+0014   | 2021-08-25 | ~                    | Drop the "No Use Of Legacy In New Code" restriction          | ✅ Accepted
 
 
 
