@@ -44,11 +44,11 @@ f(1, 2, 3, 4, 5);
 ?>
 
 it returns 
-$req: 1; $opt: 0; Nombre d'arguments : 0
-$req: 1; $opt: 2; Nombre d'arguments : 0
-$req: 1; $opt: 2; Nombre d'arguments : 1
-$req: 1; $opt: 2; Nombre d'arguments : 2
-$req: 1; $opt: 2; Nombre d'arguments : 3
+$req: 1; $opt: 0; Number of arguments : 0
+$req: 1; $opt: 2; Number of arguments : 0
+$req: 1; $opt: 2; Number of arguments : 1
+$req: 1; $opt: 2; Number of arguments : 2
+$req: 1; $opt: 2; Number of arguments : 3
 ```
 
 In our world, mixing the two ways
