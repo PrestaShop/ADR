@@ -32,7 +32,7 @@ when you accept variadic
 <?php
 function f($req, $opt = null, ...$params) {
     // $params is an array containing the remaining arguments 
-    printf('$req: %d; $opt: %d; Nombre d\'arguments : %d'."\n",
+    printf('$req: %d; $opt: %d; Number of arguments : %d'."\n",
            $req, $opt, count($params));
 }
 
