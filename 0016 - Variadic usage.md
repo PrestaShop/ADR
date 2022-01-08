@@ -1,4 +1,4 @@
-# 15. Variadic usage in method params
+# 16.  Use variadic to type-hint PHP arrays
 
 Date: 2021-01-07
 
