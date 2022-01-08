@@ -10,7 +10,7 @@ Pending
 
 Using methods with array in signature force to type the parameters in phpDocs. It exists a workaround to force the type of the items in the array, and have astronger typing :
 
-THE VARIADIC
+THE [VARIADIC](https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list)
 
 
 when you call a function/method
