@@ -83,7 +83,8 @@ It allows to type without creating a DTO for a simple collection !
 
 ## Decision
 
-
+- we don't use variadic if the method has optional parameters but the variadic is not
+- we don't use multiple variadics with different types because it's not compatible with PHP<8
 
 
 ## First implementation
