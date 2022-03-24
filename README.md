@@ -41,6 +41,7 @@ ADR ID | Date       | Discussion           | Title                              
 0017   | 2022-04-17 | [Pull Request][0017] | Backward compatibility promise                               | 💬 In discussion
 0018   | 2022-05-16 | ~                    | [Horizontal migration][0018]                                 | ✅ Accepted
 
+
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
 [adr-tools]: https://github.com/npryce/adr-tools/
 [0001]: 0001-record-architecture-decisions.md
