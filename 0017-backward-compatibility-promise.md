@@ -30,7 +30,7 @@ Backward compatibility guarantees only apply to the production packages except f
 | Interface/class removal                                        | No             |
 | Public and protected method removal [1]                        | No             |
 | Change/remove service name                                     | No             |
-| Composer dependencies without BC breaks                        | Yes            |
+| Composer dependencies upgrade without BC breaks                        | Yes            |
 | Composer dependencies used a lot                               | No             |
 | Composer dev dependencies                                      | Yes            |
 | Change Hook name                                               | No             |
