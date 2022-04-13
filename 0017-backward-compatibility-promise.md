@@ -15,7 +15,7 @@ This page describes rules and best practices for backward compatible development
 
 The PrestaShop code base is composed of two different types of packages:
 
- - **Production packages:** these are packages that are shipped 
+ - **Production packages:** these are packages that are shipped in the final release build
  - **Development packages:** these are tools that can be used by third-party developers to lint, test, format or build whatever they want. They are used as npm or composer dependencies.
 
 Backward compatibility guarantees only apply to the production packages except for modules which are not part of the public API.
@@ -29,10 +29,11 @@ Backward compatibility guarantees only apply to the production packages except f
 |----------------------------------------------------------------|----------------|
 | Interface/class removal                                        | No             |
 | Public and protected method removal [1]                        | No             |
-| Change/remove service name                                     | No             |
+| Change service name                                     | No             |
+| Remove service                                          | No             |
 | Composer dependencies upgrade without BC breaks                        | Yes            |
 | Composer dependencies used a lot                               | No             |
-| Composer dev dependencies                                      | Yes            |
+| Updating/removing composer dev dependencies                                      | Yes            |
 | Change Hook name                                               | No             |
 | Remove hook parameters                                         | No             |
 | Add hook parameters                                            | Yes            |
@@ -48,7 +49,7 @@ Backward compatibility guarantees only apply to the production packages except f
 
 | Type of Change            | Change Allowed |
 |---------------------------|----------------|
-| Queries                   | No             |
+| Change/remove Query constructor parameters                   | No             |
 | QueryResult (constructor) | yes            |
 | QueryResult (getters)     | No             |
 |                           |                |
@@ -61,7 +62,7 @@ Backward compatibility guarantees only apply to the production packages except f
 | Default parameter values | No             |
 | Return type              | No             |
 | Add parameter            | No             |
-| Force strict typing      | No             |
+| Add strict typing      | No             |
 |                          |                |
 
 #### Symfony Controller actions
@@ -74,7 +75,7 @@ Experimental Features and code should be marked with the `@internal` tags.
 
 #### Security issues
 
-Note that backward compatibility breaks are tolerated if they are required to fix a security issue.
+Backward compatibility breaks are tolerated if they are required to fix a security issue.
 
 ### Front
 
@@ -86,9 +87,10 @@ Note that backward compatibility breaks are tolerated if they are required to fi
 | `id` and `class`                       | No             |
 | Npm dev dependencies                   | Yes            |
 | Npm dependencies                       | No             |
-| Functions not exposed to the DOM       | Yes            |
-| Functions directly exposed to the DOM  | No             |
-| Change/remove template file name       | No             |
+| Functions not exposed to the global scope       | Yes            |
+| Functions directly exposed to the global scope  | No             |
+| Remove a template file                 | No             |
+| Change template path                   | No             |
 | Change/remove javascript file name [2] | Yes            |
 |                                        |                |
 
@@ -143,7 +145,7 @@ All directories name and structure are part of the public API until the split be
 | Change field default value                  | No             |
 | Change/remove table name                    | No             |
 | Add new optional field to a table           | Yes            |
-| Introducting a required filed               | No             |
+| Introducting a required field               | No             |
 | Change/remove constraints                   | Yes            |
 |                                             |                |
 
