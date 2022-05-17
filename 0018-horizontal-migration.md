@@ -16,24 +16,20 @@ As a result of the migration, the Back office structure is heterogeneous, with s
 
 To accelerate the phasing-out of legacy subsystems, the migration strategy should be changed: instead of migrating whole pages one by one, we should change the scope as to migrate whole system layers of whole Back office, across all pages. Once a layer has been finished, all obsolete subsystems linked to that layer can be removed, and migration can move on to the next layer.
 
-The project is divided into the following stages, each covering a whole layer:
+This project is divided into the following stages, each covering a whole layer:
 
 1. Controller layer
 2. View layer
 3. Form layer
 4. CQRS layer
 
-We call this strategy "horizontal migration", as oppposed to our previous strategy, referred to "vertical migration".
+We call this strategy "horizontal migration", as oppposed to our previous strategy, referred to "vertical migration". The end result is the same: full migration to Symfony. It's the path to get there that changes.
 
-### Migrate the first stage "Controller layer"
+### First stage: migrate the "Controller layer"
 
-The first stage consists in migrating the Controller Layer to Symfony while keeping most of the original behavior. This includes the use of legacy components like HelperList, HelperForm, and other helpers.
+The first stage consists in migrating the Controller Layer to Symfony (based on FrameworkBundleAdminControllers, services, sf router, and action-methods), but keeping most of the original behavior as it is, within the controller itself. This includes maintaining the Smarty template engine as well as closely related legacy components like HelperList, HelperForm, and others. 
 
-This also means maintaining the Smarty template engine as it is used in legacy controllers and closely related to legacy helpers.
-
-#### AdminController
-
-A new namespace `Bridge` will be created within the PrestaShopBundle to contain intermediary code that will be removed as the migration progresses.
+A new namespace `Bridge` will be created within the PrestaShopBundle to contain intermediary code that will be removed as the migration progresses. For example, temporary traits will be added into horizontally migrated Syfony controllers, enabling any necessary legacy features which do not belong in a fully migrated Symfony controller (like Smarty support). These traits are meant to be removed when the features will no longer be required.
 
 The `LegacyControllerBridgeInterface` replaces the controller that is present in Context, providing methods needed by modules but that don't belong in Symfony controllers, including:
 
@@ -46,20 +42,17 @@ The `LegacyControllerBridgeInterface` replaces the controller that is present in
 
 #### Helpers
 
-Legacy helpers have bridges which adapt them to work with Symfony DI:
+Legacy helpers will have bridges to adapt them to work with Symfony DI. Here are some examples:
 
-- `HelperListConfiguration`: contains all the configuration needed by the `HelperList` to generate the SQL query and generate the HTML to pass to Smarty to be shown to the client
-- `HelperListConfigurator`: sets all variables to the `HelperList` from the `HelperListConfiguration` as an `Adapter`
+- `HelperListConfigurator`: configures a `HelperList` using a `HelperListConfiguration`
 - `ResetFiltersHelper` and `FiltersHelper`: these classes come from legacy to handle filters in the list, and the reset of these filters
 - `HelperListBridge`: this class is a bridge to use a helper list to render the list in the Controller
 
-In the `Helper` namespace, we will also create a folder named `HelperListCustomizer` to customize the SQL query for the list by extending the `HelperListBridge` and overriding the `getList` method.
+#### Smarty, context and layout
 
-#### Smarty
+Since we are using Smarty and not Twig, we need to handle context initialization and layout features (menu, header, etc) which in vertically migrated controllers are handled through LegacyLayoutAdminController. This will be done through a Kernel event listener called `InitControllerListener`. This means that horizontally migrated controllers will no longer initialize a fake AdminController.
 
-We will find all parts responsible for generating HTML from Smarty in the Smarty folder and return a generated Response instance to the Symfony controller. To generate HTML from Smarty, we need many variables.
-
-To generate all these variables, we create six configurator classes, which are in charge of a part of the page:
+Getting rid of AdminController requires set up a high number of variables that were configured by it and required by the layout. These will be stored in a `ControllerConfiguration` object that will be initialized by configurator classes, each in charge of a setting up different parts of the page:
 
 - `BreadcrumbsAndTitleConfigurator`
 - `FooterConfigurator`
@@ -68,11 +61,14 @@ To generate all these variables, we create six configurator classes, which are i
 - `NotificationConfigurator`
 - `ToolbarFlagsConfigurator`
 
-The `ControllerConfiguration` object contains the configuration.
+Finally, controller actions will return a generated HTML Response instance, only using Smarty and the "default" theme instead of Twig and the "new" theme.
 
-We decide to create some traits:
+### Following stages
 
-- `SmartyTrait`: contains all methods to handle the HTML rendering like: `renderSmarty`, `setMedia`, `addCss`, `addJs`...
-- `AdminControllerTrait`: contains all methods to configure the page and to access services needed by the controller like `addAction`, `addListAction`, `addListField`, `getResetFiltersHelper`, `getFiltersHelper`, `getHelperListBridge`
+This ADR focuses on detailing the first migration stage. The outline of the next stages is as follows.
 
-We must delete this folder when fully migrating all pages to Symfony with CQRS. In this namespace, we will find a Controller folder that contains all needed Controller configurations for Smarty, header, and footer...
+In the second stage, Smarty will be removed from controllers in favor of Twig. This will require adapting the existing Helpers to work with twig and the new theme, as well as the complete removal of LegacyLayoutController.
+
+The third stage will progressively phase out HelperLists and HelperForms in favor of Grid and Symfony forms, using the form theme and extension features found in vertically migrated controllers.
+
+The fourth and final stage will consist in the introduction of the CQRS layer, removing all logic from controllers. This will be followed by the removal of obsolete components like AdminControllers.
