@@ -25,11 +25,13 @@ The project is divided into the following stages, each covering a whole layer:
 
 We call this strategy "horizontal migration", as oppposed to our previous strategy, referred to "vertical migration".
 
-### AdminController
+### Migrate the first stage "Controller layer"
 
-The first stage consists in migrating AdminControllers to Symfony while keeping most of the original behavior. This includes the use of legacy components like HelperList, HelperForm, and other helpers.
+The first stage consists in migrating the Controller Layer to Symfony while keeping most of the original behavior. This includes the use of legacy components like HelperList, HelperForm, and other helpers.
 
 This also means maintaining the Smarty template engine as it is used in legacy controllers and closely related to legacy helpers.
+
+#### AdminController
 
 A new namespace `Bridge` will be created within the PrestaShopBundle to contain intermediary code that will be removed as the migration progresses.
 
@@ -42,7 +44,7 @@ The `LegacyControllerBridgeInterface` replaces the controller that is present in
 - `addJqueryUI`
 - ...
 
-### Helpers
+#### Helpers
 
 Legacy helpers have bridges which adapt them to work with Symfony DI:
 
@@ -53,7 +55,7 @@ Legacy helpers have bridges which adapt them to work with Symfony DI:
 
 In the `Helper` namespace, we will also create a folder named `HelperListCustomizer` to customize the SQL query for the list by extending the `HelperListBridge` and overriding the `getList` method.
 
-### Smarty
+#### Smarty
 
 We will find all parts responsible for generating HTML from Smarty in the Smarty folder and return a generated Response instance to the Symfony controller. To generate HTML from Smarty, we need many variables.
 
