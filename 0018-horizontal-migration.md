@@ -8,22 +8,22 @@ Approved
 
 ## Context
 
-In our current migration strategy, migrating a page to Symfony requires switching the view from Smarty to Twig, switching listings from HelperList to Grid, switching forms from HelperForm to Symfony forms, applying the CQRS layer, and more. 
+In our current migration strategy, "migrating a page to Symfony" is not just migration: it's actually a migration + refactoring. This includes switching the view from Smarty to Twig, switching listings from HelperList to Grid, switching forms from HelperForm to Symfony forms, applying the CQRS layer, and more. 
 
-As a result of the migration, the Back office structure is heterogeneous, with some pages fully Symfony-based and others full legacy-based, increasing developer and performance overhead. In addition, legacy subsystems must remain in place and continue being maintained, as long as there are legacy pages in PrestaShop. However, we still have year's worth of work ahead of us.
+This process takes a very long time, and as a result, the Back office structure has become heterogeneous, with some pages fully Symfony-based and others full legacy-based, increasing developer and performance overhead. 
+
+In addition, legacy subsystems must remain in place and continue being maintained, they cannot be removed as long as there are legacy pages in PrestaShop. Ad we still have years' worth of work ahead of us to finish. Let's imagine that migrating the rest of the Back office to Symfony using the current strategy will take 4 years. This means that 2 years years from now, we will still have about 25% of the pages running on the legacy architecture. And because of it, we will still have to maintain AdminController, Dispatcher, overrides, etc for the whole time, until the migration is finished – 4 years from now.
 
 ## Decision
 
-To accelerate the phasing-out of legacy subsystems, the migration strategy should be changed: instead of migrating whole pages one by one, we should change the scope as to migrate whole system layers of whole Back office, across all pages. Once a layer has been finished, all obsolete subsystems linked to that layer can be removed, and migration can move on to the next layer.
-
-This project is divided into the following stages, each covering a whole layer:
+To accelerate the phasing-out of legacy subsystems, the migration strategy should be changed: instead of migrating and refactoring whole pages one by one, we should change the scope as to migrate and refactor whole system layers of whole Back office, across all pages, one after the other. The project is therefore divided into the following stages, each covering a whole layer:
 
 1. Controller layer
 2. View layer
 3. Form layer
 4. CQRS layer
 
-We call this strategy "horizontal migration", as oppposed to our previous strategy, referred to "vertical migration". The end result is the same: full migration to Symfony. It's the path to get there that changes.
+We call this strategy "horizontal migration", in opposition to our previous strategy, referred to "vertical migration". The end result is the same: full migration to Symfony. It's the path to get there that changes. 
 
 ### First stage: migrate the "Controller layer"
 
@@ -72,3 +72,9 @@ In the second stage, Smarty will be removed from controllers in favor of Twig. T
 The third stage will progressively phase out HelperLists and HelperForms in favor of Grid and Symfony forms, using the form theme and extension features found in vertically migrated controllers.
 
 The fourth and final stage will consist in the introduction of the CQRS layer, removing all logic from controllers. This will be followed by the removal of obsolete components like AdminControllers.
+
+### Why this decision makes sense
+
+Compared to the vertical approcah, the horizontal approach could take slightly longer to complete. However, its main advantage is that we no longer have to wait for the whole migration project to be complete before being able to remove obsolete subsystems: as soon as a stage is complete, all the related legacy subsystems can be removed, reducing the overall complexity of the software. For example, once all controllers have been migrated to Symfony, Dispatcher and AdminController are no longer needed and can be removed (or deprecated). By reducing the scope of migration, these "events" will happen a lot sooner than if we had to wait for the whole project to be finished: following the previous hypothetical duration of 4 years to finish the whole migration, we could get rid of AdminController and Dispatcher in two years, instead of the four it would take using the vertical approach. Same with Smarty: we could have it removed in three years instead of four.
+
+We can still continue using the vertical approch for pages where the horizontal approach would not make tactial sense, either because they are too simple to benefit from the advantages of horizontal migration, or because they require extensive refactoring (eg the product page).
