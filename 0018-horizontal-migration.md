@@ -10,7 +10,7 @@ Approved
 
 In our current migration strategy, migrating a page to Symfony requires switching the view from Smarty to Twig, switching listings from HelperList to Grid, switching forms from HelperForm to Symfony forms, applying the CQRS layer, and more. 
 
-As a result of the migration, the Back office structure is heterogeneous, with some pages fully Symfony-based and others full legacy-based, increasing developer and performance overheaad. In addition, legacy subsistems must remain in place and continue being maintained, as long as there are legacy pages in PrestaShop. However, we still have year's worth of work ahead of us.
+As a result of the migration, the Back office structure is heterogeneous, with some pages fully Symfony-based and others full legacy-based, increasing developer and performance overhead. In addition, legacy subsystems must remain in place and continue being maintained, as long as there are legacy pages in PrestaShop. However, we still have year's worth of work ahead of us.
 
 ## Decision
 
