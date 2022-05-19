@@ -12,7 +12,7 @@ In our current migration strategy, "migrating a page to Symfony" is not just mig
 
 This process takes a very long time, and as a result, the Back office structure has become heterogeneous, with some pages fully Symfony-based and others full legacy-based, increasing developer and performance overhead. 
 
-In addition, legacy subsystems must remain in place and continue being maintained, they cannot be removed as long as there are legacy pages in PrestaShop. Ad we still have years' worth of work ahead of us to finish. Let's imagine that migrating the rest of the Back office to Symfony using the current strategy will take 4 years. This means that 2 years from now, we will still have about 25% of the pages running on the legacy architecture. And because of it, we will still have to maintain AdminController, Dispatcher, overrides, etc for the whole time, until the migration is finished – 4 years from now.
+In addition, legacy subsystems must remain in place and continue being maintained, they cannot be removed as long as there are legacy pages in PrestaShop. And we still have years' worth of work ahead of us to finish. Let's imagine that migrating the rest of the Back office to Symfony using the current strategy will take, say, 4 years. This means that 2 years from now, we will still have about 25% of the pages running on the legacy architecture. And because of it, we will still have to maintain AdminController, Dispatcher, overrides, etc for the whole time, until the migration is finished – 4 years from now.
 
 ## Decision
 
