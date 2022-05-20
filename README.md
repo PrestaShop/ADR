@@ -38,6 +38,8 @@ ADR ID | Date       | Discussion           | Title                              
 0014   | 2021-08-25 | ~                    | Drop the "No Use Of Legacy In New Code" restriction          | ✅ Accepted
 0015   | 2021-09-16 | [Pull Request][0015] | Split business logic from DOM logic of JS                    | 💬 In discussion
 0016   | 2022-01-07 | [Pull Request][0016] | Use variadic to type-hint PHP arrays                         | 💬 In discussion
+0017   | 2022-04-17 | [Pull Request][0017] | Backward compatibility promise                               | 💬 In discussion
+0018   | 2022-04-17 | [Pull Request][0018] | Horizontal migration                                         | 💬 In discussion
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
 [adr-tools]: https://github.com/npryce/adr-tools/
@@ -56,3 +58,5 @@ ADR ID | Date       | Discussion           | Title                              
 [0014]: 0014-drop-the-no-use-of-legacy-in-new-code-restriction.md
 [0015]: https://github.com/PrestaShop/ADR/pull/21
 [0016]: https://github.com/PrestaShop/ADR/pull/24
+[0017]: https://github.com/PrestaShop/ADR/pull/25
+[0018]: https://github.com/PrestaShop/ADR/pull/26
