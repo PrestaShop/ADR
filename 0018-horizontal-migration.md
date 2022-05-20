@@ -16,14 +16,18 @@ In addition, legacy subsystems must remain in place and continue being maintaine
 
 ## Decision
 
-To accelerate the phasing-out of legacy subsystems, the migration strategy should be changed: instead of migrating and refactoring whole pages one by one, we should change the scope as to migrate and refactor whole system layers of whole Back office, across all pages, one after the other. The project is therefore divided into the following stages, each covering a whole layer:
+To accelerate the phasing-out of legacy subsystems, the strategy to migrate the remaining pages should be changed. Instead of migrating and refactoring whole pages in a single shot, we should divide the migration into stages, each covering a different technical layer, and deliver a single stage of migration for each page at a time. 
+
+We have identified 4 migration stages:
 
 1. Controller layer
 2. View layer
 3. Form layer
 4. CQRS layer
 
-We call this strategy "horizontal migration", in opposition to our previous strategy, referred to "vertical migration". The end result is the same: full migration to Symfony. It's the path to get there that changes. 
+Each time we migrate a page, we only migrate the part corresponding to the first stage. Only once the first stage has been performed on all the remaining pages, we can move to the second stage and perform it on all the pages left to migrate. This repeats until all the stages are complete, and the migration is finished.
+
+We call this strategy "horizontal migration", in opposition to our previous strategy, referred to "vertical migration", because it focuses on finishing whole technical layers across all pages before moving on to the next layer. The end result is the same: full migration to Symfony. It's the path to get there that changes.
 
 ### First stage: migrate the "Controller layer"
 
@@ -82,6 +86,10 @@ The fourth and final stage will consist in the introduction of the CQRS layer, r
 
 ### Why this decision makes sense
 
-Compared to the vertical approcah, the horizontal approach could take slightly longer to complete. However, its main advantage is that we no longer have to wait for the whole migration project to be complete before being able to remove obsolete subsystems: as soon as a stage is complete, all the related legacy subsystems can be removed, reducing the overall complexity of the software. For example, once all controllers have been migrated to Symfony, Dispatcher and AdminController are no longer needed and can be removed (or deprecated). By reducing the scope of migration, these "events" will happen a lot sooner than if we had to wait for the whole project to be finished: following the previous hypothetical duration of 4 years to finish the whole migration, we could get rid of AdminController and Dispatcher in two years, instead of the four it would take using the vertical approach. Same with Smarty: we could have it removed in three years instead of four.
+Suppose there are 30 pages left to migrate. Instead of creating 30 PRs, each containing 10000 lines changed in 80 files, taking forever to complete, review and verify, we will create four groups of 30 PRs. The first 30 PRs only modify the page's controller, leaving the rest of the code untouched. The second 30 PRs modify only the page's templates (switching them to Twig). The third 30 PRs introduce Symfony forms and Grid. And the fourth 30 PRs add CQRS. Each "group" of 30 PRs cannot be started before the previous groups has been finished.
 
-We can still continue using the vertical approch for pages where the horizontal approach would not make tactial sense, either because they are too simple to benefit from the advantages of horizontal migration, or because they require extensive refactoring (eg the product page).
+Compared to the vertical approcah, the horizontal approach might take slightly longer to complete. However, its main advantage is that we no longer have to wait for the whole migration project to be complete before being able to remove obsolete subsystems: as soon as a stage is complete, developers benefit from a single way of doing things across all the system, and all the obsolete legacy subsystems can be removed. For example, once all controllers have been migrated to Symfony, Dispatcher and AdminController are no longer needed and can be removed (or deprecated), and developrs benefit from the Symfony debug bar everywhere. By reducing the scope of migration deliverables, these "events" will happen a lot sooner than if we had to wait for the whole project to be finished: following the previous hypothetical duration of 4 years to finish the whole migration, we could get rid of AdminController and Dispatcher in two years, instead of the four it would take using the vertical approach. Same with Smarty: we could have it removed in three years instead of four. 
+
+Reducing the perimeter of deliverables in smaller chunks means smaller PRs, which should translate in easier and faster reviews and QA validation.
+
+We can still continue using the vertical approch for pages where the horizontal approach would not make tactical sense, either because they are too simple to benefit from the advantages of horizontal migration, or because they require extensive refactoring (eg the product page).
