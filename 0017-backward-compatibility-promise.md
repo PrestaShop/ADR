@@ -8,8 +8,13 @@ N/A
 
 ## Context
 
-If you are a theme or module developer, the following guidelines will help you to ensure smooth upgrades to all futur minor releases.
-This page describes rules and best practices for backward compatible development.
+The following lines describe what changes are considered backward compatible and what changes are not.
+
+PrestaShop attempts to follow [SemVer](https://semver.org/) which states that not-backward compatible changes are only allowed in major versions.
+
+Some circumstances might require to break this promise. Whenever such a usecase happens, the maintainer team will make sure to provide a clear list of the not backward compatible changes introduced in a patch or minor version.
+
+For example backward compatibility breaks are allowed if they are required to fix a security issue.
 
 ### Packages
 
@@ -20,50 +25,62 @@ The PrestaShop code base is composed of two different types of packages:
 
 Backward compatibility guarantees only apply to the production packages except for modules which are not part of the public API.
 
-
 ### PHP
 
 #### General purpose
 
-| Type of Change                                                 | Change Allowed |
-|----------------------------------------------------------------|----------------|
-| Interface/class removal                                        | No             |
-| Public and protected method removal [1]                        | No             |
-| Change service name                                     | No             |
-| Remove service                                          | No             |
-| Upgrade composer dependencies that don't produce BC breaks                | Yes            |
-| Composer dependencies used a lot                               | No             |
-| Updating/removing composer dev dependencies                                      | Yes            |
-| Change Hook name                                               | No             |
-| Remove hook parameters                                         | No             |
-| Add hook parameters                                            | Yes            |
-| Change value of a constant                                     | Yes            |
-| Remove or rename constants                                     | No             |
-| Adding argument to an event                                    | Yes            |
-| Modifying the types of thrown exceptions                       | No             |
-| Throw a new type of exception from an existing method          | Yes            |
-| Adding a optional constructor parameter at the end of the list | Yes            |
-|                                                                |                |
+Note: Symfony is mentioned below as rely on Symfony framework and its container
+
+| Type of Change                                                      | Change Allowed |
+|---------------------------------------------------------------------|----------------|
+| Interface/class removal                                             | No             |
+| Public and protected method removal [1]                             | No             |
+| Change Symfony service name                                         | No             |
+| Remove Symfony service                                              | No             |
+| Change Hook name                                                    | No             |
+| Remove hook parameters                                              | No             |
+| Add hook parameters                                                 | Yes            |
+| Change value of a constant                                          | Yes            |
+| Remove or rename constants                                          | No             |
+| Adding argument to an Symfony event                                 | Yes            |
+| Modifying the type of thrown exceptions                             | No             |
+| Throw a new type of exception from an existing method               | Yes            |
+| Adding a optional constructor parameter at the end of the args list | Yes            |
+|                                                                     |                |
+
+#### Composer dependencies
+
+| Type of Change                                                              | Change Allowed |
+|-----------------------------------------------------------------------------|----------------|
+| Upgrade composer dependencies that do not introduce BC breaks               | Yes            |
+| Composer dependencies with a strong impact on userland code and modules [2] | No             |
+| Updating/removing composer dev dependencies                                 | Yes            |
 
 #### CQRS
 
-| Type of Change            | Change Allowed |
-|---------------------------|----------------|
-| Change/remove Query constructor parameters                   | No             |
-| QueryResult (constructor) | yes            |
-| QueryResult (getters)     | No             |
-|                           |                |
+PrestaShop uses Commands and Queries. Specific rules apply to these PHP objects that define a contract.
 
-#### Methods and functions
+| Type of Change                              | Change Allowed |
+|---------------------------------------------|----------------|
+| Change a QueryResult constructor            | Yes            |
+|                                             |                |
 
-| Type of Change           | Change Allowed |
-|--------------------------|----------------|
-| Rename                   | No             |
-| Default parameter values | No             |
-| Return type              | No             |
-| Add parameter            | No             |
-| Add strict typing      | No             |
-|                          |                |
+#### PHP methods and functions
+
+| Type of Change                                     | Change Allowed |
+|----------------------------------------------------|----------------|
+| Rename                                             | No             |
+| Default parameter values                           | No             |
+| Return type                                        | No             |
+| Add parameter                                      | No             |
+| Add optional parameter at the end of the args list | Yes            |
+| Add strict typing                                  | No             |
+|                                                    |                |
+
+
+#### Symfony services constructors
+
+As classes whose instantiation is delegated to the Symfony container are not supposed to be instantiated otherwise, changing the constructor of those classes is allowed.
 
 #### Symfony Controller actions
 
@@ -71,28 +88,26 @@ Since controllers can be decorated, actions are not in the public API.
 
 #### Experimental Features
 
-Experimental Features and code should be marked with the `@internal` tags.
+Experimental Features and code should be marked with the tags `@internal` or `@experimental` .
 
-#### Security issues
-
-Backward compatibility breaks are tolerated if they are required to fix a security issue.
+Experimental code is not part of the public API.
 
 ### Front
 
-#### Back office
+#### Back office theme
 
-| Type of Change                         | Change Allowed |
-|----------------------------------------|----------------|
-| HTML markup                            | Yes            |
-| `id` and `class`                       | No             |
-| Npm dev dependencies                   | Yes            |
-| Npm dependencies                       | No             |
-| Functions not exposed to the global scope       | Yes            |
-| Functions directly exposed to the global scope  | No             |
-| Remove a template file                 | No             |
-| Change template path                   | No             |
-| Change/remove javascript file name [2] | Yes            |
-|                                        |                |
+| Type of Change                                            | Change Allowed |
+|-----------------------------------------------------------|----------------|
+| HTML markup                                               | Yes            |
+| `id` and `class`                                          | No             |
+| Npm dev dependencies                                      | Yes            |
+| Upgrade npm dependencies that do not introduce BC breaks  | Yes            |
+| Functions not exposed to the global scope                 | Yes            |
+| Functions directly exposed to the global scope            | No             |
+| Remove a template file                                    | No             |
+| Change template path                                      | No             |
+| Change/remove javascript file name [3]                    | Yes            |
+|                                                           |                |
 
 #### Front office
 
@@ -104,21 +119,21 @@ Backward compatibility breaks are tolerated if they are required to fix a securi
 | Remove injected variables into template engines           | No             |
 | Add variables into template engines                       | Yes            |
 | Change/remove template file name                          | No             |
-| Change/remove javascript file name [2]                    | Yes            |
+| Change/remove javascript file name [3]                    | Yes            |
 |                                                           |                |
 
-#### Default theme
+#### Theme
 
-| Type of Change                        | Change Allowed |
-|---------------------------------------|----------------|
-| HTML markup                           | Yes            |
-| `id` and `class`                      | No             |
-| Npm dev dependencies                  | Yes            |
-| Npm dependencies                      | No             |
-| Functions not exposed to the DOM      | Yes            |
-| Functions directly exposed to the DOM | No             |
-| Change/remove template file name      | No             |
-|                                       |                |
+| Type of Change                                            | Change Allowed |
+|-----------------------------------------------------------|----------------|
+| HTML markup                                               | Yes            |
+| `id` and `class`                                          | No             |
+| Npm dev dependencies                                      | Yes            |
+| UUpgrade npm dependencies that do not introduce BC breaks | Yes            |
+| Functions not exposed to the DOM                          | Yes            |
+| Functions directly exposed to the DOM                     | No             |
+| Change/remove template file name                          | No             |
+|                                                           |                |
 
 ### Directory structure
 
@@ -133,7 +148,8 @@ All directories name and structure are part of the public API until the split be
 | Remove elements in XML/JSON struct | No             |
 | Add elements in XML/JSON struct    | Yes            |
 | Remove parameters                  | No             |
-| Add parameters                     | Yes            |
+| Add optional parameters            | Yes            |
+| Add required parameters            | No             |
 |                                    |                |
 
 
@@ -150,5 +166,6 @@ All directories name and structure are part of the public API until the split be
 |                                             |                |
 
 
-[1] Not if the class is tagged as `@internal`
-[2] Only if it's not a production file
+[1] Not if the class is tagged as `@internal` or `@experimental`
+[2] Examples: Doctrine, Guzzle...
+[3] Only if it's not a production file
