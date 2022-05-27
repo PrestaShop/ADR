@@ -39,7 +39,7 @@ ADR ID | Date       | Discussion           | Title                              
 0015   | 2021-09-16 | [Pull Request][0015] | Split business logic from DOM logic of JS                    | 💬 In discussion
 0016   | 2022-01-07 | [Pull Request][0016] | Use variadic to type-hint PHP arrays                         | 💬 In discussion
 0017   | 2022-04-17 | [Pull Request][0017] | Backward compatibility promise                               | 💬 In discussion
-0018   | 2022-04-17 | [Pull Request][0018] | Horizontal migration                                         | 💬 In discussion
+0018   | 2022-05-16 | ~                    | [Horizontal migration][0018]                                 | ✅ Accepted
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
 [adr-tools]: https://github.com/npryce/adr-tools/
