@@ -70,7 +70,7 @@ PrestaShop uses Commands and Queries. Specific rules apply to these PHP objects 
 | Type of Change                                     | Change Allowed |
 |----------------------------------------------------|----------------|
 | Rename                                             | No             |
-| Default parameter values                           | No             |
+| Modify default parameter values                           | No             |
 | Return type                                        | No             |
 | Add parameter                                      | No             |
 | Add optional parameter at the end of the args list | Yes            |
@@ -161,7 +161,7 @@ All directories name and structure are part of the public API until the split be
 | Change field default value                  | No             |
 | Change/remove table name                    | No             |
 | Add new optional field to a table           | Yes            |
-| Introducting a required field               | No             |
+| Add a required field               | No             |
 | Change/remove constraints                   | Yes            |
 |                                             |                |
 
