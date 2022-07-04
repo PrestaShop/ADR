@@ -10,7 +10,7 @@ Accepted
 
 PrestaShop is a development platform used by developers and integrators to create e-commerce sites. Developers can create other software (including modules & themes) to interact with PrestaShop, extend it, or modify its behavior. For that, they rely on software interfaces which are commonly referred to as "APIs". Whenever any of these interfaces change, existing third-party software must be adapted to work with the new interface -- this is called a "backward-incompatible change", "breaking change" ("BC") or "backward compatibility break" ("BC break"). 
 
-Developing a modular and extensible platform like PrestaShop requires a delicate balance between allowing the software to evolve in the optimal way, and keeping its interafaces as they are, for as long as possible, in order to reduce impact on third-party software. For that, it is important to clarify what belongs to the API and must be protected from changes, and what part of the software is private and can be modified freely.
+Developing a modular and extensible platform like PrestaShop requires a delicate balance between allowing the software to evolve in the optimal way, and keeping its interfaces as they are, for as long as possible, in order to reduce impact on third-party software. For that, it is important to clarify what belongs to the API and must be protected from changes, and what part of the software is private and can be modified freely.
 
 Further reading: [The Pain Points](https://build.prestashop.com/news/prestashop-in-2019-and-beyond-part-2-pain-points/#no-clearly-defined-api)
 
@@ -18,9 +18,9 @@ Further reading: [The Pain Points](https://build.prestashop.com/news/prestashop-
 
 PrestaShop is committed to follow the [SemVer convention](https://semver.org/), which states that backward incompatible changes are only allowed in major versions.
 
-Only exceptional circumstances (e.g. fixing a security issue) can allow introducing backward incompatible changes in minor or patch versions. Whenever this happens, the maintainer team will make sure to provide a clear list of the affected components.
+Only exceptional circumstances (e.g. fixing a security issue, critical bug, ...) can allow introducing backward-incompatible changes in minor or patch versions. Whenever this happens, the maintainer team will make sure to provide a clear list of the affected components.
 
-The following lines detail or backward compatibility promise, and describe what changes are allowed or not in minor or patch versions. Further restrictions (or allowances) might be added in the future. 
+The following lines detail our backward compatibility promise, and describe what changes are allowed or not in minor or patch versions. Further restrictions (or allowances) might be added in the future. 
 
 ### Packages
 
@@ -37,7 +37,7 @@ Our backward compatibility promise only applies to production packages, except f
 
 Note: "Symfony" is mentioned below as relating to the Symfony framework and its components, including the service container.
 
-| Type of Change                                                      | Allowed |
+| Type of Change                                                      | Allowed        |
 |---------------------------------------------------------------------|----------------|
 | Remove an interface/class                                           | No             |
 | Remove public or protected method [^1]                              | No             |
