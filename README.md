@@ -38,7 +38,7 @@ ADR ID | Date       | Discussion           | Title                              
 0014   | 2021-08-25 | ~                    | Drop the "No Use Of Legacy In New Code" restriction          | ✅ Accepted
 0015   | 2021-09-16 | [Pull Request][0015] | Split business logic from DOM logic of JS                    | 💬 In discussion
 0016   | 2022-01-07 | [Pull Request][0016] | Use variadic to type-hint PHP arrays                         | 💬 In discussion
-0017   | 2022-04-17 | [Pull Request][0017] | Backward compatibility promise                               | 💬 In discussion
+0017   | 2022-04-17 | ~                    | [Backward compatibility promise][0017]                       | ✅ Accepted
 0018   | 2022-05-16 | ~                    | [Horizontal migration][0018]                                 | ✅ Accepted
 
 
