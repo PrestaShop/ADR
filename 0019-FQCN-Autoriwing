@@ -14,11 +14,13 @@ If there are some interfaces that are used many times, injection can still be do
 
 # Consequences
 
+- This notation will become the default one for all service, unless for exceptional specific uses cases.
 - We will need to rename all services to avoid confusion so they use FQCNs. That can be done gradually.
   - Create new private service definitions for these services
   - Update the old definition to set it as an alias of the new service
   - If the old service was public, set the alias as `public: true`
   - Deprecate the old service and it will be removed in next major.
+  - We need to ensure the decoration still works for deprecated aliases for third party modules.
 
 Example: 
 
