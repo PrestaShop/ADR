@@ -1,4 +1,12 @@
-# Context
+# 19. FQCN & autowiring
+
+Date: 2022-11-16
+
+## Status
+
+Approved
+
+## Context
 
 As PrestaShop 8.0 as been released, PrestaShop is still using snake case for services names. The proposition is to use service FQCN for services and enable use of autowiring. This is [the recommended way](https://symfony.com/doc/current/contributing/code/standards.html#service-naming-conventions) from Symfony.
 
@@ -12,7 +20,7 @@ That allows usage of this features
 If there are some interfaces that are used many times, injection can still be done manually.
 
 
-# Consequences
+## Consequences
 
 - This notation will become the default one for all service, unless for exceptional specific uses cases.
 - We will need to rename all services to avoid confusion so they use FQCNs. That can be done gradually.
