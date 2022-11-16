@@ -25,7 +25,7 @@ ADR ID | Date       | Discussion           | Title                              
 ------ | -----------| -------------------- | -------------------------------------------------------------| -----------------
 0001   | 2019-01-22 | ~                    | [Record architecture decisions][0001]                        | ✅ Accepted
 0002   | 2019-02-15 | ~                    | [Mixed use of composer and zip modules][0002]                | ✅ Accepted
-0003   | 2019-10-15 | ~                    | [Use of autowiring][0003]                                    | ❌ Rejected
+0003   | 2019-10-15 | ~                    | [Use of autowiring][0003] - amended in [FQCN Autowiring][0019]| ❌ Rejected
 0004   | 2020-04-17 | ~                    | [Keep QA and Devs HTML selectors separate][0004]             | ❌ Rejected
 0005   | 2019-01-22 | ~                    | [Define ACL rules for Symfony pages][0005]                   | ❌ Abandoned
 0006   | 2020-02-13 | ~                    | [Registration of a bundle-like module][006]                  | ❌ Abandoned
@@ -40,6 +40,7 @@ ADR ID | Date       | Discussion           | Title                              
 0016   | 2022-01-07 | [Pull Request][0016] | Use variadic to type-hint PHP arrays                         | 💬 In discussion
 0017   | 2022-04-17 | ~                    | [Backward compatibility promise][0017]                       | ✅ Accepted
 0018   | 2022-05-16 | ~                    | [Horizontal migration][0018]                                 | ✅ Accepted
+0019   | 2022-11-16 | ~                    | [FQCN Autowiring][0019]                                      | ✅ Accepted
 
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
@@ -61,3 +62,4 @@ ADR ID | Date       | Discussion           | Title                              
 [0016]: https://github.com/PrestaShop/ADR/pull/24
 [0017]: https://github.com/PrestaShop/ADR/pull/25
 [0018]: https://github.com/PrestaShop/ADR/pull/26
+[0019]: https://github.com/PrestaShop/ADR/pull/29
