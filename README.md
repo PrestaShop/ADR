@@ -41,6 +41,7 @@ ADR ID | Date       | Discussion           | Title                              
 0017   | 2022-04-17 | ~                    | [Backward compatibility promise][0017]                       | ✅ Accepted
 0018   | 2022-05-16 | ~                    | [Horizontal migration][0018]                                 | ✅ Accepted
 0019   | 2022-11-16 | ~                    | [FQCN Autowiring][0019]                                      | ✅ Accepted
+0019   | 2022-12-27 | ~                    | [BC Break & PHP Abandoned Dependency][0020]                  | 💬 In discussion
 
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
@@ -63,3 +64,4 @@ ADR ID | Date       | Discussion           | Title                              
 [0017]: https://github.com/PrestaShop/ADR/pull/25
 [0018]: https://github.com/PrestaShop/ADR/pull/26
 [0019]: https://github.com/PrestaShop/ADR/pull/29
+[0020]: 0020-bc-break-and-abandoned-dependency.md
