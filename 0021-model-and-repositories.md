@@ -28,8 +28,8 @@ Base folder src/Core/Model (naming tbd)
 2. Interfaces object/model
 
 Take all classes based on ObjectModel and turn them into an "entity interface" representing each properties and database columns
-The getters for localized values returns only one field which is already translated
 
+### Generic interface (always translated)
 Object with multilang properties have getters for those field which return only string already localized (the language id is specified when fetching the object).
 
 ```php
@@ -43,7 +43,8 @@ interface ContactInterface {
 }
 ```
 
-We also have a Localized interface (used mainly in form edition)
+### Localized interface (mostly for CRUD)
+
 ```php
 interface LocalizedContactInterface {
     public function getContactId(): int;
@@ -59,10 +60,13 @@ interface LocalizedContactInterface {
 
 3. Repositories
 
-Get entity:
+### Get entity by ID:
 - multi lang entities MUST specify a languageId
 - multi shop entities MUST specify a shopId
 - multi shop entities which have more complex multi shop behaviour MAY have a getter based on ShopConstraint
+- entities which are neither multi shop not multi lang don't need these parameters of course
+
+Two repositories are needed for multi lang interfaces since they don't return the same interface. However for multi shop entities the shopId is always mandatory.
 
 ```php
 interface ContactRepository {
@@ -70,9 +74,32 @@ interface ContactRepository {
 }
 
 interface LocalizedContactRepository {
+    /**
+     * Returns ALL languages present in the database.
+     *
+     * @param contactId
+     * @param shopId
+     *
+     * @return LocalizedContactInterface
+     */
     public function getLocalizedContact(contactId, shopId): LocalizedContactInterface;
+
+    /**
+     * @param contactId $
+     * @param shopId $
+     * @param languages List of filtered languages
+     *
+     * @return LocalizedContactInterface
+     */
     public function getLocalizedContactByLanguages(contactId, shopId, languages): LocalizedContactInterface;
 }
 ```
 
+### Get byXYZ
+### List / search / filter (return IDs or full objects)
+### Create
+### Update
+### Delete (multishop or not)
+
 4. DBAL queries VS Object models
+5. Which rules do we apply with which tools (prevent usage of specific namespaces, keep the namespace clean)
