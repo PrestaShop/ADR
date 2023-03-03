@@ -51,7 +51,7 @@ interface LocalizedContactInterface {
     public function getEmail(): int;
 
     /**
-     * @return array<int, string> Associative array, the ley is languageId and the value is the localized value.
+     * @return array<int, string> Associative array, the key is languageId and the value is the localized value.
      */
     public function getLocalizedNames(): array;
     public function getLocalizedDescriptions(): array;
@@ -69,11 +69,11 @@ interface LocalizedContactInterface {
 Two repositories are needed for multi lang interfaces since they don't return the same interface. However for multi shop entities the shopId is always mandatory.
 
 ```php
-interface ContactRepository {
+interface ContactRepositoryInterface {
     public function getContact(contactId, languageId, shopId): ContactInterface;
 }
 
-interface LocalizedContactRepository {
+interface LocalizedContactRepositoryInterface {
     /**
      * Returns ALL languages present in the database.
      *
@@ -91,15 +91,74 @@ interface LocalizedContactRepository {
      *
      * @return LocalizedContactInterface
      */
-    public function getLocalizedContactByLanguages(contactId, shopId, languages): LocalizedContactInterface;
+    public function getLocalizedContactWithLanguages(contactId, shopId, languages): LocalizedContactInterface;
+}
+```
+
+When the entity is not found an exception should be thrown `CurrencyNotFoundException` `ContactNotFoundException`
+
+Not found exception MUST extend the associated Domain Exception, but each type of exception MAY implement a generic Exception interface
+
+```php
+class CurrencyNotFoundException extends CurrencyException implements EntityNotFoundExceptionInterface {
 }
 ```
 
 ### Get byXYZ
+
+```php
+interface CurrencyRepositoryInterface {
+    public function getCurrency(currencyId, languageId, shopId): CurrencyInterface;
+    public function getCurrencyByIsoCode(isoCode, languageId, shopId): CurrencyInterface;
+    
+    public function getCurrencyBy(array $criteria, languageId, shopId): CurrencyInterface;
+}
+```
+
+When more than one entity is found (can happen with getByCriteria) an exception should be thrown `NonUniqueCurrencyException` that implements `NonUniqueEntityExceptionInterface`
+
 ### List / search / filter (return IDs or full objects)
-### Create
-### Update
-### Delete (multishop or not)
+
+Decision must be taken between
+- return an array of interfaces (we lose the strong type, but no need to implement a collection for each entity, MAYBE more performant?)
+- return a collection of interfaces
+
+Decision must be taken between
+- findAll
+- getAll
+
+```php
+interface CurrencyRepositoryInterface {
+    /**
+     * @return CurrencyInterface[]
+     */
+    public function findAll(): array;
+    public function getAll(): CurrencyCollectionInterface;
+
+    public function findBy(array $filters = [], array $sortBy = [], ?int $limit = null, ?int $offset = null): array;
+}
+```
 
 4. DBAL queries VS Object models
 5. Which rules do we apply with which tools (prevent usage of specific namespaces, keep the namespace clean)
+6. Where do we put the implementation
+
+7. Use int or VOs
+8. Write operations
+
+### Create
+
+To be decided:
+- we'll need hooks to be triggered provided the created interface
+- should factory/repository trigger hook or be completely hook independent
+- should the hook be dispatched by the handler
+- should we have a hook helper which handles automatical hook dispatch + repository call, this helper (seems like a good separation)
+
+```php
+interface CurrencyFactoryInterface {
+    public function create()
+}
+```
+
+### Update
+### Delete (multishop or not)
