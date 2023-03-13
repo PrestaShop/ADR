@@ -25,6 +25,9 @@ Base folder src/Core/Model (naming tbd)
 - tool configuration a bit more complex but it should be possible with exclude/include rules
 - time spent to maintain the tools
 
+Which rules do we apply with which tools (prevent usage of specific namespaces, keep the namespace clean)
+Use int or VOs
+
 2. Interfaces object/model
 
 Take all classes based on ObjectModel and turn them into an "entity interface" representing each properties and database columns
@@ -140,25 +143,78 @@ interface CurrencyRepositoryInterface {
 ```
 
 4. DBAL queries VS Object models
-5. Which rules do we apply with which tools (prevent usage of specific namespaces, keep the namespace clean)
-6. Where do we put the implementation
-
-7. Use int or VOs
-8. Write operations
-
-### Create
-
-To be decided:
-- we'll need hooks to be triggered provided the created interface
-- should factory/repository trigger hook or be completely hook independent
-- should the hook be dispatched by the handler
-- should we have a hook helper which handles automatical hook dispatch + repository call, this helper (seems like a good separation)
+- Repositories (or sub repositories) based on ObjectModel should be in Adapter namespace
+- Repositories based on DBAL should be in PrestaShopBundle
+- If the repo uses both, it should be in PrestaShopBundle for all methods based on DBAL, the adapter using ObjectModel should be injected inside this repository
 
 ```php
-interface CurrencyFactoryInterface {
-    public function create()
+namespace PrestaShopBundle\Repository;
+
+use PrestaShop\PrestaShop\Adapter\Product\Repository\ProductRepository as AdpaterProductRepository;
+
+class ProductRepository implements ProductRepositoryInterface {
+    private $productRepository;
+
+    public __contruct(AdpaterProductRepository $productRepository) {
+        $this->productRepository = $productRepository;
+    }
+
+    public function getProduct(int $productId, int $languageId, int $shopId): LocalizedProductInterface
+    {
+        return $this->productRepository->getByLanguage(new ProductId($productId), new ShopId($shopId), new LanguageId($languageId));
+    }
+
+    public function getLocalizedProduct(int $productId, int $shopId): LocalizedProductInterface
+    {
+        // Return ObjectModel that has to implement the interface
+        return $this->productRepository->get(new ProductId($productId), new ShopId($shopId));
+    }
 }
 ```
 
-### Update
-### Delete (multishop or not)
+```php
+namespace PrestaShop\PrestaShop\Adapter\Security;
+
+class Access {
+    public function getRoles(): array
+    {
+        $rolesFlattenArray = LegacyAccess::getRoles($employeeProfileId);
+
+        // Transform flatten array into interfaces (implemented by DTO probaly)
+        return array_map(turnArrayToInterface, $rolesFlattenArray);
+    }
+}
+
+namespace PrestaShopBundle\Repository;
+
+use PrestaShop\PrestaShop\Adapter\Security\Access as AdapterAccess;
+
+class AccessRepository implements AccessRepositoryInterface {
+    private $access;
+
+    public __contruct(AdapterAccess $access) {
+        $this->access = $access;
+    }
+
+    /**
+     * @return Role[]
+     */
+    public function getRoles(): array
+    {
+        return $this->access->getRoles();
+    }
+
+    // OR
+
+    /**
+     * @return Role[]
+     */
+    public function getRoles(): array
+    {
+        // Or implement it via DBAL query
+        return $this->connection->createQueryBuilder()
+        ...
+        ;
+    }
+}
+```
