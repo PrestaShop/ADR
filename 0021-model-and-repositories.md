@@ -143,9 +143,18 @@ interface CurrencyRepositoryInterface {
 ```
 
 4. DBAL queries VS Object models
-- Repositories (or sub repositories) based on ObjectModel should be in Adapter namespace
-- Repositories based on DBAL should be in PrestaShopBundle
-- If the repo uses both, it should be in PrestaShopBundle for all methods based on DBAL, the adapter using ObjectModel should be injected inside this repository
+
+- In all cases we will have a base implementation in PrestaShopBundle\Model\Repository that is preferably based on DBAL
+  - the DBAL queries are implemented inside this repository and passed into DTOs
+  - you will need to create a DTO in PrestaShopBundle\Model that implement the interface
+
+Specific cases based on legacy:
+  - If the implementation is based on ObjectModel you create an ObjectModelRepository in Adapter/MyEntityDomain/Repository/MyEntityRepository
+    - the ObjectModel must implement the interface
+    - the ObjectModelRepository is passed as a dependency into the PrestaShopBundle\Repository and is used a proxy
+  - If the implementation is based on a Doctrine Entity you create an EntityRepository in PrestashopBundle/Entity/Repository/MyEntityRepository
+    - the Doctrine entity must implement the interface
+    - the Doctrine repository is passed as a dependency into the PrestaShopBundle\Repository and is used a proxy
 
 ```php
 namespace PrestaShopBundle\Repository;
@@ -155,7 +164,7 @@ use PrestaShop\PrestaShop\Adapter\Product\Repository\ProductRepository as Adpate
 class ProductRepository implements ProductRepositoryInterface {
     private $productRepository;
 
-    public __contruct(AdpaterProductRepository $productRepository) {
+    public __contruct(AdapterProductRepository $productRepository) {
         $this->productRepository = $productRepository;
     }
 
