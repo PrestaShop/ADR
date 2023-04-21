@@ -78,7 +78,7 @@ will evolve and handle typed array, then we may be able to improve this).
 
 ### Get entity by ID:
 - multi lang entities MUST specify a languageId
-- multi shop entities MUST specify a shopId
+- multi shop entities which content can vary depending on shop MUST specify a shopId (it it's only a basic association without content modification a simple `getAssociatedShopIds()` is enough and the `shopId` parameter is not necessary)
 - multi shop entities which have more complex multi shop behaviour MAY have a getter based on ShopConstraint
 - entities which are neither multi shop nor multi lang don't need these parameters of course
 
@@ -184,7 +184,7 @@ Specific cases based on legacy:
 **DBAL method example**
 
 ```php
-namespace PrestaShop\PrestaShop\Model\Repository;
+namespace PrestaShopBundle\Model\Repository;
 
 class AccessRepository implements AccessRepositoryInterface
 {
@@ -212,7 +212,7 @@ class AccessRepository implements AccessRepositoryInterface
 **ObjectModel example**
 
 ```php
-namespace PrestaShop\PrestaShop\Model\Repository;
+namespace PrestaShopBundle\Model\Repository;
 
 use PrestaShop\PrestaShop\Adapter\Product\Repository\ProductRepository as AdpaterProductRepository;
 
@@ -241,7 +241,7 @@ class ProductRepository implements ProductRepositoryInterface
 **Doctrine example**
 
 ```php
-namespace PrestaShop\PrestaShop\Model\Repository;
+namespace PrestaShopBundle\Model\Repository;
 
 use PrestaShopBundle\Entity\Repository\ShopRepository as DoctrineShopRepository;
 
@@ -282,7 +282,7 @@ class Access
     }
 }
 
-namespace PrestaShop\PrestaShop\Model\Repository;
+namespace PrestaShopBundle\Model\Repository;
 
 use PrestaShop\PrestaShop\Adapter\Security\Access as AdapterAccess;
 
