@@ -1,10 +1,20 @@
 # 21. Model and Repositories aiming to replace the usages of legacy ObjectModel
 
-Date: 2023-02-23
+Date: 2023-10-27
 
 ## Status
 
-In Discussion
+Rejected
+
+## Decision
+
+This proposal will not be applied, the main arguments against it are:
+- the fear of adding a new extra layer that would confuse the community more than it helps it
+- the cost/time it would take to apply this on all the entities in place of other more valuable topics
+- adding this extra layer would indeed hide the legacy core classes, but it doesn't remove their usage, it mostly hides it
+
+Instead of going into that direction it was decided that it would be more valuable for the project to start migrating the core classes to Doctrine entities,
+an ADR has been opened to define the strategy to do this https://github.com/PrestaShop/ADR/pull/37
 
 ## Context
 

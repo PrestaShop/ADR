@@ -1,4 +1,4 @@
-# 23. CQRS API quidelines
+# 23. CQRS API guidelines
 
 Date: 2023-08-24
 
