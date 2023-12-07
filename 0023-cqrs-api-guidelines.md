@@ -28,18 +28,18 @@ For the identifier related to one entity we use the domain name suffixed by `Id`
 List: `ApiPlatform\Metadata\GetCollection` `/hooks`<br />
 One hook endpoint: `ApiPlatform\Metadata\Get` `/hook/{hookId}`
 
-For APIs that are sub part of a larger entity (wether it's to display its related entities or small parts of a big entity) we keep the initial domain name as the beginning
+For APIs that are sub part of a larger entity (whether it's to display its related entities or small parts of a big entity) we keep the initial domain name as the beginning
 of the URI and append it with the definition of the sub parts (separated by a `/`). If it's the sub part of an identified entity, we complete the initial URI path and append
-the sub part after the entity ID. When the sub part is an action name or a compund name we use camel case convention.
+the sub part after the entity ID. When the sub part is an action name or a compound name we use kebab case convention.
 
 Example:
 - Hook status (sub part): `/hook/{hookId}/status`
 - Search (action) products:  `/products/search`
 - Product combinations (sub part): `/product/{productId}/combinations`
-- Assign product to category (action): `/product/{productId}/assignToCategory`
+- Assign product to category (action): `/product/{productId}/assign-to-category`
 - Set product carriers (set a sub part): `/product/{productId}/carriers`
-- Attribute group (list):  `/attributeGroups`
-- Attribute group associated values (list of sub part):  `/attributeGroup/{attributeGroupId}/attributes`
+- Attribute group (list):  `/attribute-groups`
+- Attribute group associated values (list of sub part):  `/attribute-group/{attributeGroupId}/attributes`
 
 ### HTTP methods
 
@@ -54,7 +54,7 @@ Similar convention for list of IDs we use the domain and append `Ids` at the end
 
 - Bulk delete products: Method DELETE `/products` with `productIds` parameter in request body (array of product IDs)
 - Bulk duplicate products: Method POST `/products/duplicate` with `productIds` parameter in request body (array of product IDs)
-- Bulk update status: Method PUT `/products/updateStatus` with `productIds` parameter in request body (array of product IDs)
+- Bulk update status: Method PUT `/products/update-status` with `productIds` parameter in request body (array of product IDs)
 
 ### CQRS Mapping
 
