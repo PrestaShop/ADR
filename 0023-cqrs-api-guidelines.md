@@ -41,6 +41,14 @@ Example:
 - Attribute group (list):  `/attribute-groups`
 - Attribute group associated values (list of sub part):  `/attribute-group/{attributeGroupId}/attributes`
 
+### Multilang
+
+Some entities in PrestaShop have multilang values (like product names, category descriptions, ...), this data must be presented in the API endpoints:
+- single entities endpoints return ALL the languages in an associative array indexed by language ID (ex: `{"localizedNames": [1: "english name", 2: "nom français", ]}`)
+- list of entities return only one language so multilang fields are returned as strings (ex: `{"name": "english name"}`), the language used by default is the default language configured on the shop but you can specify a `langId` query parameter to fetch another language values
+
+To allow knowing the association between languages and language IDs a `/languages` endpoint will be accessible without any needed permission.
+
 ### HTTP methods
 
 Read operations use **GET** method<br />
