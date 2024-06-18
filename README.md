@@ -44,7 +44,7 @@ To learn more about ADRs, read [this article][adr].
 | 0021   | 2023-10-27 | -                    | [Model and Repositories aiming to replace the usages of legacy ObjectModel][0021] | ❌ Rejected       |
 | 0022   | 2023-05-30 | [Pull Request][0022] | [Module storage folders][0022]                                                    | 💬 In discussion |
 | 0023   | 2023-10-27 | -                    | [CQRS API quidelines][0023]                                                       | ✅ Accepted       |
-| 0024   | 2023-10-27 | [Pull Request][0024] | [Refactoring of PrestaShop context][0024]                                         | 💬 In discussion |
+| 0024   | 2023-10-27 | -                    | [Refactoring of PrestaShop context][0024]                                         | ✅ Accepted       |
 | 0025   | 2023-10-27 | [Pull Request][0025] | [Doctrine entities migration][0025]                                               | 💬 In discussion |
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
