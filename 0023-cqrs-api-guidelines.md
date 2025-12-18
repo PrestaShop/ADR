@@ -51,12 +51,12 @@ To allow knowing the association between languages and language IDs a `/language
 
 ### HTTP methods
 
-
 Read operations use **GET** method and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSGet`<br />
 Creation operations use **POST** method (without ID specified) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate`<br />
 Full update operations use **PUT** method (ex: PUT `/products/{productId}`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSUpdate`<br />
 Partial update operations use **PATCH** method (ex: PATCH `/products/{productId}`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSPartialUpdate`<br />
-Delete operations use **DELETE** method (ex: DELETE `/products/{productId}`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSDelete`
+Delete operations use **DELETE** method (ex: DELETE `/products/{productId}`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSDelete`<br />
+Duplicate operations use **POST** method with ID specified (ex: POST `/products/{productId}/duplicate`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate`
 
 ### Custom operations
 
@@ -64,7 +64,7 @@ To simplify the integration of our custom CQRS based implementation some custom 
 
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSGet` for read operations on a single resource
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSGetCollection` for read operations on a list of resources (not paginated)
-- `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate` for creation operations
+- `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate` for creation and duplication operations
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSUpdate` for full update operations
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSPartialUpdate` for partial update operations
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSDelete` for delete operations
