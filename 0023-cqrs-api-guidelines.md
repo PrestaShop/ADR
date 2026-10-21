@@ -46,11 +46,12 @@ Example:
 
 Some entities in PrestaShop have multilang values (like product names, category descriptions, ...), this data must be presented in the API endpoints:
 - single entities endpoints return ALL the languages in an associative array indexed by locale (ex: `{"names": {"en-US": "english name", "fr-FR": "nom français"}}`)
-- list of entities return only one language so multilang fields are returned as strings (ex: `{"name": "english name"}`), the language used by default is the default language configured on the shop, but you can specify a `langId` query parameter to fetch another language values
+- list of entities based on a grid return only one language, since a grid lists one language, so multilang fields are returned as strings (ex: `{"name": "english name"}`), the language used by default is the default language configured on the shop, but you can specify a `langId` query parameter to fetch another language values
+- list of entities based on a CQRS query follow the contract of the query: when the query returns all the languages, the endpoint returns them too, like a single entity endpoint
 
 To allow knowing the association between languages and language IDs a `/languages` endpoint will be accessible without any needed permission.
 
-The other contexts are selected the same way, by request parameters: `shopId`, `shopGroupId`, `shopIds` or `allShops` set the shop constraint, `currencyId` the currency (defaults: the default shop, language and currency of the shop). A list returns the values of the selected language, shop and currency.
+The other contexts are selected the same way, by request parameters: `shopId`, `shopGroupId`, `shopIds` or `allShops` set the shop constraint, `currencyId` the currency (defaults: the default shop, language and currency of the shop). A list returns the values of the selected shop and currency, and of the selected language when it returns only one.
 
 ### HTTP methods
 
