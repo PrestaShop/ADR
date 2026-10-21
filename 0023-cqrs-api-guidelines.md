@@ -45,7 +45,7 @@ Example:
 ### Multilang
 
 Some entities in PrestaShop have multilang values (like product names, category descriptions, ...), this data must be presented in the API endpoints:
-- single entities endpoints return ALL the languages in an associative array indexed by locale (ex: `{"names": {"en-US": "english name", "fr-FR": "nom français"}}`)
+- single entities endpoints return ALL the languages in an associative array indexed by locale (ex: `{"names": {"en-US": "english name", "fr-FR": "nom français"}}`), at every level: the localized fields of nested objects are indexed by locale too
 - list of entities based on a grid return only one language, since a grid lists one language, so multilang fields are returned as strings (ex: `{"name": "english name"}`), the language used by default is the default language configured on the shop, but you can specify a `langId` query parameter to fetch another language values
 - list of entities based on a CQRS query follow the contract of the query: when the query returns all the languages, the endpoint returns them too, like a single entity endpoint
 
@@ -64,7 +64,7 @@ Duplicate operations use **POST** method with ID specified (ex: POST `/products/
 
 The operation follows the command: **PATCH** only when the command accepts partial data (optional setters, nullable parameters); when every parameter is required on each call the operation is a **PUT**, even when it only covers a part of the entity (ex: PUT `/carts/{cartId}/addresses`).<br />
 A delete and a body-less action answer **204**; every other write returns the updated resource, read back through the query of the resource.<br />
-An operation receiving files uses **POST** (multipart), even when it updates.
+An operation receiving files uses **POST** with a `multipart/form-data` body, even when it updates: PHP only reads the files of a POST request. An update that may carry a file is therefore a multipart **POST**, partial or full like its command; when it is partial, a JSON **PATCH** on the same URI updates the fields without the file, which is left out of its input (a full update needs the file, so it has no JSON variant). A creation is a **POST** anyway: it accepts JSON, and multipart when a file is sent. In a multipart body the other fields are form fields: booleans are sent as `1` / `0`, nested values with the bracket syntax (ex: `names[en-US]=...`) or, from PrestaShop 9.2.0, as a JSON-encoded part.
 
 ### Custom operations
 
@@ -90,7 +90,7 @@ Similar convention for list of IDs we use the domain and append `Ids` at the end
 - Bulk duplicate products: Method POST `/products/bulk-duplicate` with `productIds` parameter in request body (array of product IDs)
 - Bulk update status: Method PUT `/products/bulk-update-status` with `productIds` parameter in request body (array of product IDs)
 
-In case no HTTP method finds a consensus for the bulk operation, POST method is used by default.
+A bulk update is a **PUT**: its command needs the IDs and the value on every call (see HTTP methods). In case no HTTP method finds a consensus for the bulk operation, POST method is used by default.
 
 The list of IDs is required (an empty body is a 422) and each ID is a positive integer (422 otherwise). When the handler collects the errors (PrestaShop 9.1.2, `AbstractBulkCommandHandler`), a partial failure answers **207 Multi-Status** with one error per failed ID. A bulk endpoint may take an option in the path (ex: DELETE `/categories/bulk-delete/{deleteMode}`).
 
