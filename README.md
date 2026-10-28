@@ -46,6 +46,7 @@ To learn more about ADRs, read [this article][adr].
 | 0023   | 2023-10-27 | -                    | [CQRS API quidelines][0023]                                                       | ✅ Accepted       |
 | 0024   | 2023-10-27 | -                    | [Refactoring of PrestaShop context][0024]                                         | ✅ Accepted       |
 | 0025   | 2023-10-27 | [Pull Request][0025] | [Doctrine entities migration][0025]                                               | 💬 In discussion |
+| 0026   | 2026-10-20 | [Pull Request][0026] | [Pluggable file storage][0026]                                                    | 💬 In discussion |
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
 [adr-tools]: https://github.com/npryce/adr-tools/
@@ -73,3 +74,4 @@ To learn more about ADRs, read [this article][adr].
 [0023]: 0023-cqrs-api-guidelines.md
 [0024]: https://github.com/PrestaShop/ADR/pull/36
 [0025]: https://github.com/PrestaShop/ADR/pull/37
+[0026]: 0026-pluggable-file-storage.md
