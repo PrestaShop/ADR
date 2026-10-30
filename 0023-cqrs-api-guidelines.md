@@ -63,7 +63,7 @@ Delete operations use **DELETE** method (ex: DELETE `/products/{productId}`) and
 Duplicate operations use **POST** method with ID specified (ex: POST `/products/{productId}/duplicate`) and should use `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate`
 
 The operation follows the command: **PATCH** only when the command accepts partial data (optional setters, nullable parameters); when every parameter is required on each call the operation is a **PUT**, even when it only covers a part of the entity (ex: PUT `/products/{productId}/carriers`).<br />
-A delete and a body-less action answer **204**; every other write returns the updated resource, read back through the query of the resource.<br />
+A delete and a body-less action answer **204**; every other write returns the updated resource, read back through the query of the resource. A write on the sub-content of a parent (rows or associations of one entity: set, add, update or remove several of them) returns the updated parent, or the updated list on the class listing that sub-content, a removal included (**200**, PrestaShop 9.2.1).<br />
 An operation receiving files uses **POST** with a `multipart/form-data` body, even when it updates: PHP only reads the files of a POST request. An update that may carry a file is therefore a multipart **POST**, partial or full like its command; when it is partial, a JSON **PATCH** on the same URI updates the fields without the file, which is left out of its input (a full update needs the file, so it has no JSON variant). A creation is a **POST** anyway: it accepts JSON, and multipart when a file is sent. In a multipart body the other fields are form fields: booleans are sent as `1` / `0`, nested values with the bracket syntax (ex: `names[en-US]=...`) or, from PrestaShop 9.2.0, as a JSON-encoded part.
 
 ### Custom operations
@@ -75,7 +75,8 @@ To simplify the integration of our custom CQRS based implementation some custom 
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreate` for creation and duplication operations
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSUpdate` for full update operations
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSPartialUpdate` for partial update operations
-- `PrestaShopBundle\ApiPlatform\Metadata\CQRSDelete` for delete operations
+- `PrestaShopBundle\ApiPlatform\Metadata\CQRSDelete` for delete operations, answering the resource read back by its `CQRSQuery` when it has one (PrestaShop 9.2.1)
+- `PrestaShopBundle\ApiPlatform\Metadata\CQRSCreateCollection`, `CQRSUpdateCollection`, `CQRSPartialUpdateCollection` and `CQRSDeleteCollection` (PrestaShop 9.2.1) for the writes on the sub-content list of a parent: the request body is one object, the response is the list read back by the `CQRSQuery` (or the list returned by the command), like a `CQRSGetCollection`
 - `PrestaShopBundle\ApiPlatform\Metadata\PaginatedList` to paginate elements through a back-office grid data factory
 - `PrestaShopBundle\ApiPlatform\Metadata\CQRSPaginate` (PrestaShop 9.0.3) to paginate elements through a CQRS query that handles the pagination itself (`itemsField` / `countField` of the query result)
 - `PrestaShopBundle\ApiPlatform\Metadata\UpdatePosition` to reorder elements
@@ -96,13 +97,13 @@ The list of IDs is required (an empty body is a 422) and each ID is a positive i
 
 ### Status codes
 
-- **200** for a read, an update or an action with a response, **201** for a creation, **204** for a delete or a body-less action
+- **200** for a read, an update, an action with a response or a removal on the sub-content of a parent, **201** for a creation, **204** for a delete or a body-less action
 - **404** for an unknown identifier, in the path or in the body (`shopIds`, `customerId`...)
 - **422** for a validation error of the resource constraints or a domain constraint error (`GroupConstraintException`...), as RFC 7807 problem details, the constraint violations listed per field
 - **207** for a partial failure of a bulk operation
 - **403** for a token without the scope of the operation
 
-An unmapped exception is a 500: every domain exception an endpoint can raise is mapped to its status (`exceptionToStatus`).
+An unmapped exception is a 500: every domain exception an endpoint can raise is mapped to its status (`exceptionToStatus`). The `status` of the problem details is the status of the response (PrestaShop 9.2.1, always 500 before).
 
 ### Scope names
 
