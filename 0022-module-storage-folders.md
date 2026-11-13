@@ -79,6 +79,16 @@ services:
 
 **Public data** is media produced after installation that the front office displays as-is: images uploaded by the merchant (logos, banners, contact pictures), generated thumbnails. It goes to `img/modules/<module>/`, because `img/` is already served by the web server, already restricted to media types, and already part of what every hosting setup persists and shares between nodes.
 
+**Configuration** is not one location but three, depending on who writes it and when:
+
+| Kind of configuration | Location | Reason |
+|---|---|---|
+| Shipped with the module (`config/services.yml`, `config/routes.yml`, ...) | `modules/<module>/config/` | It is code: versioned, read-only, loaded by the kernel |
+| Settings edited by the merchant (options, API keys entered in the back office) | `ps_configuration` (`Configuration::updateValue()`) or the module's own tables | Already the standard, and scoped per shop in multistore; no file involved |
+| Files written at runtime (generated JSON/XML, certificates, private keys) | `var/modules/<module>/` | Private data that must persist and never be served |
+
+Secrets that depend on the environment (production and staging credentials) are better read from environment variables than stored in the database, which ends up in dumps and backups.
+
 `upload/` and `download/` remain reserved to the core (product customizations and virtual products); modules MUST NOT write there.
 
 ### 3. The core provides the paths, not the module
