@@ -58,7 +58,7 @@ Writing at runtime into `modules/<module>/` causes concrete problems:
 
 **Cache** is for anything the module can rebuild and that is never served directly: compiled templates, API responses, temporary files of an import. The core may delete it at any time; the module must not rely on it being present.
 
-**Logs** go to `var/logs/`, through a Monolog logger declared in the module's services, named `<module>_<env>.log` (rotating handler, `%kernel.logs_dir%`). A module MUST NOT write logs anywhere else. Example:
+**Logs** go to `var/logs/`, through a Monolog logger declared in the module's services, named `<module>_<env>.log` (rotating handler, `%kernel.logs_dir%`). A module MUST NOT write logs anywhere else. A module with several channels keeps the module name as prefix (`<module>_api_<env>.log`, `<module>_sync_<env>.log`), so that `<module>_*` always matches all its files. Example:
 
 ```yaml
 services:
@@ -121,6 +121,7 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 - **A single `var/modules/<module>/` with `public/`, `private/` and `cache/` subfolders** (suggested on PR #34). One location per module is easier to reason about, but `var/` is denied to the web server in every supported configuration (Apache `.htaccess`, the documented nginx setup). Serving `var/modules/*/public/` means punching a hole in that rule for every host, and a misconfigured host would expose private data next to it. A separate top-level `public/` keeps the boundary "denied/served" at the top-level directory, where operators already handle it.
 - **`img/modules/<module>/`** (first version of this proposal). `img/` is already served, persisted and restricted to safe types, but only to media: XML feeds, CSV and generated CSS/JS cannot be served from there, and widening `img/.htaccess` would weaken it for the core images too. Keeping media in `img/` and everything else elsewhere would bring back two public locations per module.
 - **A non-guessable public path** (random segment per shop, suggested on PR #34 to avoid revealing installed modules). The module name is already visible in the front office through its assets (`modules/<module>/views/...`) and hook output; obfuscating only the data folder adds a path to store and migrate without hiding anything.
+- **A subfolder per module in `var/logs/`** (`var/logs/<module>/<module>_<env>.log`). It keeps a crowded `var/logs/` tidy, but hosting cleanup jobs, `logrotate` configurations and log collectors (Kubernetes sidecars, Filebeat, Promtail) commonly target `var/logs/*.log` without recursing, so logs in a subfolder risk never being cleaned or collected. The module prefix already groups a module's files, and the rotating handler caps their number.
 - **Leaving it to the devdocs.** The current paragraph has existed for years without being followed, precisely because it is not a decision and comes with no API.
 
 ## Consequences
