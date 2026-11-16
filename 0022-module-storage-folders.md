@@ -48,7 +48,7 @@ Writing at runtime into `modules/<module>/` causes concrete problems:
 | Cache and temporary files | `var/cache/<env>/modules/<module>/` | Denied | Nothing: wiped on every cache clear | Must be rebuildable at any time |
 | Logs | `var/logs/` | Denied | Rotation | One file per module and environment |
 | Private data | `var/modules/<module>/` | Denied | Cache clear, upgrade, uninstall | Owned by the module |
-| Public data | `public/modules/<module>/` | Served as static files, no script execution | Cache clear, upgrade, uninstall | Owned by the module |
+| Public data | `files/modules/<module>/` | Served as static files, no script execution | Cache clear, upgrade, uninstall | Owned by the module |
 
 `<module>` is always the technical name of the module, so two modules can never collide and an operator can tell at a glance which module owns a file.
 
@@ -77,11 +77,11 @@ services:
 
 **Private data** is everything that must persist but must never be served directly: configuration files, keys, exports, invoices, files uploaded by customers. When such a file has to be downloaded, the module exposes it through a controller that checks the permissions of the requester and streams the file. The web server never serves `var/` directly.
 
-**Public data** is every file produced after installation that is meant to be fetched as-is by anyone holding its URL: images uploaded by the merchant (logos, banners, contact pictures), generated thumbnails, product feeds (Google Merchant Center XML), public PDF documents, CSS or JS generated from the module settings. It goes to `public/modules/<module>/`, a new top-level directory served directly by the web server, without going through PHP.
+**Public data** is every file produced after installation that is meant to be fetched as-is by anyone holding its URL: images uploaded by the merchant (logos, banners, contact pictures), generated thumbnails, product feeds (Google Merchant Center XML), public PDF documents, CSS or JS generated from the module settings. It goes to `files/modules/<module>/`, a new top-level directory served directly by the web server, without going through PHP.
 
 Since this directory is writable by PHP and served by the web server, the core enforces two rules on it:
 
-- **No script execution.** The core ships a `public/.htaccess` that denies `.php`, `.phtml`, `.phar` and any other extension the server could execute, and sets `X-Content-Type-Options: nosniff`. The documented nginx configuration gets the equivalent rule. A module MUST NOT rely on executing anything from there.
+- **No script execution.** The core ships a `files/.htaccess` that denies `.php`, `.phtml`, `.phar` and any other extension the server could execute, and sets `X-Content-Type-Options: nosniff`. The documented nginx configuration gets the equivalent rule. A module MUST NOT rely on executing anything from there.
 - **Public means public.** A file is placed there only if it can be read by anyone who knows or guesses its URL. Files holding personal or commercial data (order or customer exports, invoices, private feeds) are private data, whatever their format, and are served through a controller that checks permissions.
 
 **Configuration** is not one location but three, depending on who writes it and when:
@@ -118,25 +118,25 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 
 ## Options considered and rejected
 
-- **A single `var/modules/<module>/` with `public/`, `private/` and `cache/` subfolders** (suggested on PR #34). One location per module is easier to reason about, but `var/` is denied to the web server in every supported configuration (Apache `.htaccess`, the documented nginx setup). Serving `var/modules/*/public/` means punching a hole in that rule for every host, and a misconfigured host would expose private data next to it. A separate top-level `public/` keeps the boundary "denied/served" at the top-level directory, where operators already handle it.
+- **A single `var/modules/<module>/` with `public/`, `private/` and `cache/` subfolders** (suggested on PR #34). One location per module is easier to reason about, but `var/` is denied to the web server in every supported configuration (Apache `.htaccess`, the documented nginx setup). Serving `var/modules/*/public/` means punching a hole in that rule for every host, and a misconfigured host would expose private data next to it. A separate top-level `files/` keeps the boundary "denied/served" at the top-level directory, where operators already handle it.
 - **`img/modules/<module>/`** (first version of this proposal). `img/` is already served, persisted and restricted to safe types, but only to media: XML feeds, CSV and generated CSS/JS cannot be served from there, and widening `img/.htaccess` would weaken it for the core images too. Keeping media in `img/` and everything else elsewhere would bring back two public locations per module.
 - **A non-guessable public path** (random segment per shop, suggested on PR #34 to avoid revealing installed modules). The module name is already visible in the front office through its assets (`modules/<module>/views/...`) and hook output; obfuscating only the data folder adds a path to store and migrate without hiding anything.
+- **`public/modules/<module>/`** (suggested during the review). Explicit, but `public/` is the web root of a Symfony application: if PrestaShop moves to a dedicated web root one day, the two meanings would collide. `files/` carries no such meaning.
 - **A subfolder per module in `var/logs/`** (`var/logs/<module>/<module>_<env>.log`). It keeps a crowded `var/logs/` tidy, but hosting cleanup jobs, `logrotate` configurations and log collectors (Kubernetes sidecars, Filebeat, Promtail) commonly target `var/logs/*.log` without recursing, so logs in a subfolder risk never being cleaned or collected. The module prefix already groups a module's files, and the rotating handler caps their number.
 - **Leaving it to the devdocs.** The current paragraph has existed for years without being followed, precisely because it is not a decision and comes with no API.
 
 ## Consequences
 
 - Module developers get one answer to "where do I write this file?", and agencies stop debating it per project.
-- An operator knows which directories to persist and share between nodes: `img/`, `upload/`, `download/`, `public/`, `var/modules/`. `var/cache/` stays local to each node, `modules/` can ship read-only in the image.
+- An operator knows which directories to persist and share between nodes: `img/`, `upload/`, `download/`, `files/`, `var/modules/`. `var/cache/` stays local to each node, `modules/` can ship read-only in the image.
 - Backups and environment synchronisation can exclude cache and logs as a whole.
 - Logs of every module are found and rotated in one place.
 - Upgrading or removing a module no longer destroys merchant data.
 - Existing modules writing into their own folder keep working but are non-compliant; native modules have to be migrated, each with an upgrade script.
-- A new top-level directory, `public/`, has to be created by the installer and by the upgrade tool, shipped with its `.htaccess`, added to the documented nginx configuration, and mounted as a persistent volume by hosting setups.
+- A new top-level directory, `files/`, has to be created by the installer and by the upgrade tool, shipped with its `.htaccess`, added to the documented nginx configuration, and mounted as a persistent volume by hosting setups.
 - Feeds, exports and generated assets that modules serve today through a PHP script can be served as static files, which is faster and cacheable by a CDN.
 
 ## Open questions
 
-1. **Name of the public directory.** `public/` is explicit, but in Symfony it names the web root; if PrestaShop moves to a dedicated web root one day, the two meanings would collide. Alternatives: `media/modules/<module>/`, `files/modules/<module>/`.
-2. **Shop scope.** Should the locator offer a per-shop subfolder (`<module>/<id_shop>/`) for multistore setups, or is it left to the module?
-3. **Name of the service and parameters**, to align with the storage names of ADR 0026 (`modules_cache`, `modules_private`, `modules_public`) if it is accepted first.
+1. **Shop scope.** Should the locator offer a per-shop subfolder (`<module>/<id_shop>/`) for multistore setups, or is it left to the module?
+2. **Name of the service and parameters**, to align with the storage names of ADR 0026 (`modules_cache`, `modules_private`, `modules_public`) if it is accepted first.
