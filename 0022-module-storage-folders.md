@@ -92,8 +92,6 @@ Since this directory is writable by PHP and served by the web server, the core e
 | Settings edited by the merchant (options, API keys entered in the back office) | `ps_configuration` (`Configuration::updateValue()`) or the module's own tables | Already the standard, and scoped per shop in multistore; no file involved |
 | Files written at runtime (generated JSON/XML, certificates, private keys) | `var/modules/<module>/` | Private data that must persist and never be served |
 
-Secrets that depend on the environment (production and staging credentials) are better read from environment variables than stored in the database, which ends up in dumps and backups.
-
 `upload/` and `download/` remain reserved to the core (product customizations and virtual products); modules MUST NOT write there.
 
 ### 3. The core provides the paths, not the module
@@ -101,13 +99,15 @@ Secrets that depend on the environment (production and staging credentials) are 
 Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the locations can later move or be backed by another storage (0026) without touching the modules.
 
 - The core exposes a service, `PrestaShop\PrestaShop\Core\Module\ModuleStorageLocatorInterface`, returning for a module name its cache directory, private data directory, public data directory and the public URL of the latter. Directories are created on first access.
+- Each of these methods takes an optional shop ID. Without it, the locator returns the module's root (`<module>/`), for data shared by all shops; with it, a subfolder `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The same code works on a single-shop installation, which simply has one shop ID.
+- The locator also exposes `removeModuleData(string $moduleName)`, deleting the module's private and public data, so that a module wiping its data does not walk the directories itself.
 - The equivalent container parameters (`prestashop.module_cache_dir`, `prestashop.module_data_dir`, `prestashop.module_public_dir`) are available for modules declaring their own services, with the module name appended by the module.
 - Legacy modules reach the same service through `Module::get()` / the container; no new method is added on the `Module` class, since a module already declaring a method with the same name would break (BC promise, ADR 0017).
 
 ### 4. Uninstall and removal
 
 - On uninstall, the core wipes the module's cache directory. Private and public data are kept, so that reinstalling the module, or installing a newer version, does not lose the merchant's data, consistently with database tables a module may choose to keep.
-- A module that wants to delete its data on uninstall does it explicitly in `uninstall()`, through the same service.
+- A module that wants to delete its data on uninstall does it explicitly in `uninstall()`, by calling `removeModuleData()`. Keeping is the default because a forgotten deletion can be done later, while a deleted logo or feed history cannot be restored.
 
 ### 5. Adoption
 
@@ -123,6 +123,8 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 - **A non-guessable public path** (random segment per shop, suggested on PR #34 to avoid revealing installed modules). The module name is already visible in the front office through its assets (`modules/<module>/views/...`) and hook output; obfuscating only the data folder adds a path to store and migrate without hiding anything.
 - **`public/modules/<module>/`** (suggested during the review). Explicit, but `public/` is the web root of a Symfony application: if PrestaShop moves to a dedicated web root one day, the two meanings would collide. `files/` carries no such meaning.
 - **A subfolder per module in `var/logs/`** (`var/logs/<module>/<module>_<env>.log`). It keeps a crowded `var/logs/` tidy, but hosting cleanup jobs, `logrotate` configurations and log collectors (Kubernetes sidecars, Filebeat, Promtail) commonly target `var/logs/*.log` without recursing, so logs in a subfolder risk never being cleaned or collected. The module prefix already groups a module's files, and the rotating handler caps their number.
+- **A flag declaring whether the module's files are deleted on uninstall** (suggested during the review). It would duplicate `uninstall()`, where the module already decides what happens to its tables and configuration; a single place for that decision is easier to follow.
+- **A folder per shop group.** Group membership can change, which would leave a shop's files in the folder of its former group.
 - **Leaving it to the devdocs.** The current paragraph has existed for years without being followed, precisely because it is not a decision and comes with no API.
 
 ## Consequences
@@ -138,5 +140,4 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 
 ## Open questions
 
-1. **Shop scope.** Should the locator offer a per-shop subfolder (`<module>/<id_shop>/`) for multistore setups, or is it left to the module?
-2. **Name of the service and parameters**, to align with the storage names of ADR 0026 (`modules_cache`, `modules_private`, `modules_public`) if it is accepted first.
+1. **Name of the service and parameters**, to align with the storage names of ADR 0026 (`modules_cache`, `modules_private`, `modules_public`) if it is accepted first.
