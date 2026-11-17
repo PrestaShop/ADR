@@ -58,7 +58,7 @@ Writing at runtime into `modules/<module>/` causes concrete problems:
 
 **Cache** is for anything the module can rebuild and that is never served directly: compiled templates, API responses, temporary files of an import. The core may delete it at any time; the module must not rely on it being present.
 
-**Logs** go to `var/logs/`, through a logger provided by the core. `PrestaShop\PrestaShop\Core\Module\ModuleLoggerFactoryInterface::create(string $moduleName, ?string $channel = null)` returns a PSR-3 logger writing to `<module>_<env>.log`, or `<module>_<channel>_<env>.log` for a module with several channels, so that `<module>_*` always matches all its files. The files go next to the core log (`PS_LOG_OUTPUT`) with the same rotation (`PS_LOG_MAX_FILES`), and the logger works the same in the back office, the front office and the CLI. A module MUST NOT write logs anywhere else, and does not declare its own Monolog handler: `%kernel.logs_dir%` is not defined in the legacy front-office container, where most modules log, and a handler of its own would ignore `PS_LOG_OUTPUT` and `PS_LOG_MAX_FILES`. Example:
+**Logs** go to `var/logs/`, through a logger provided by the core. `PrestaShop\PrestaShop\Core\Module\ModuleLoggerFactoryInterface::create(string $moduleName, ?string $channel = null)` returns a PSR-3 logger writing to `<module>_<env>.log`, or `<module>_<channel>_<env>.log` for a module with several channels, so that `<module>_*` always matches all its files. The files go next to the core log (`PS_LOG_OUTPUT`) with the same rotation (`PS_LOG_MAX_FILES`), and the logger works the same in the back office, the front office and the CLI. A module MUST NOT write logs anywhere else, and on a core providing this logger it does not declare its own Monolog handler: `%kernel.logs_dir%` is not defined in the legacy front-office container, where most modules log, and a handler of its own would ignore `PS_LOG_OUTPUT` and `PS_LOG_MAX_FILES`. Example:
 
 ```yaml
 services:
@@ -89,23 +89,24 @@ Since this directory is writable by PHP and served by the web server, the core e
 
 ### 3. The core provides the storage, not the paths
 
-Modules must not build these paths themselves from `_PS_ROOT_DIR_`, nor write their private and public data with `file_put_contents()` and the other PHP file functions: the day a shop keeps these files elsewhere (a shared disk, a bucket, through ADR 0026), every module would have to be rewritten.
+On a core that provides the services below, modules must not build these paths themselves from `_PS_ROOT_DIR_`, nor write their private and public data with `file_put_contents()` and the other PHP file functions: the day a shop keeps these files elsewhere (a shared disk, a bucket, through ADR 0026), every module would have to be rewritten. On older cores, the locations still apply as conventions (see section 5).
 
 - **Private and public data are written through the core.** The core exposes a service, `PrestaShop\PrestaShop\Core\Module\ModuleStorageProviderInterface`, returning for a module name its private storage and its public storage. Each storage offers `write()`, `writeStream()`, `read()`, `readStream()`, `exists()`, `delete()` and `listContents()`, on paths relative to the module's location; the public storage adds `publicUrl()`. They are implemented on the local disk (`var/modules/<module>/`, `files/modules/<module>/`) and are backed by the named storages of 0026 once it is accepted, with no change in the modules.
 - **`localPath()` for libraries that need a real file.** Some private files can only be handed to a library as a path, such as client certificates and keys for cURL or OpenSSL. The private storage offers `localPath()`, returning the file itself on the local disk, or a copy in the module's cache directory when the storage is remote. It is the only method that does not carry over to another storage, and is documented as such: a module uses it only when the library leaves no other choice.
 - **The cache keeps a path.** Smarty, GD or Imagick need a real directory, and the cache is local to each node by design. The provider returns the module's cache directory, `var/cache/<env>/modules/<module>/`, created on first access; the container parameter `prestashop.module_cache_dir` is available for modules declaring their own services, with the module name appended by the module.
 - **Shop scope.** Each method of the provider takes an optional shop ID. Without it, it returns the storage of the module's root (`<module>/`), for data shared by all shops; with it, a subfolder `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The same code works on a single-shop installation, which simply has one shop ID.
-- The provider also exposes `removeModuleData(string $moduleName)`, deleting the module's private and public data.
 - Legacy modules reach the same service through `Module::get()` / the container; no new method is added on the `Module` class, since a module already declaring a method with the same name would break (BC promise, ADR 0017).
 
 ### 4. Uninstall and removal
 
-- On uninstall, the core wipes the module's cache directory. Private and public data are kept, so that reinstalling the module, or installing a newer version, does not lose the merchant's data, consistently with database tables a module may choose to keep.
-- A module that wants to delete its data on uninstall does it explicitly in `uninstall()`, by calling `removeModuleData()`. Keeping is the default because a forgotten deletion can be done later, while a deleted logo or feed history cannot be restored.
+- On uninstall, the core wipes the module's cache directory. Private and public data are kept by default, so that reinstalling the module, or installing a newer version, does not lose the merchant's data. Keeping is the default because a forgotten deletion can be done later, while a deleted logo or feed history cannot be restored.
+- **The merchant decides whether the data goes.** The uninstall confirmation, which already offers to delete the module folder (`ModuleManager::uninstall($name, $deleteFiles)`), gets a second, unchecked option to also delete the module's data, and `prestashop:module uninstall` gets a `--delete-data` option. When it is chosen, the core deletes `var/modules/<module>/` and `files/modules/<module>/`, every shop included. The two options stay separate: deleting the module folder to reinstall a clean copy must not cost the merchant its data.
+- A module MUST NOT delete its private and public data itself in `uninstall()`, which would take that choice away from the merchant. Database tables are not covered by this ADR and keep their current behaviour.
 
 ### 5. Adoption
 
 - The rules apply as soon as this ADR is accepted, as a recommendation for all module developers and as a requirement for native modules, which are migrated one by one.
+- **The locations work on any core version; the services come with the next minor.** A module supporting older cores follows the same locations without the services: cache in `_PS_CACHE_DIR_ . 'modules/<module>/'`, private data in `var/modules/<module>/`, logs in `var/logs/<module>_<env>.log` through its own Monolog handler. It switches to the storage and logger services when the container has them. Public data is the exception, since `files/` and its server rules are shipped by the core: on an older core, a module creating `files/modules/<module>/` copies the core's `files/.htaccess` into it, and nginx hosts have to add the rule themselves.
 - A module moving existing data out of its own folder does it in an upgrade script, so that merchants do not lose files.
 - The devdocs good-practices page is rewritten from this ADR, and the PrestaShop Addons validator can flag runtime writes into `modules/`.
 - From the next major version, the project officially supports a read-only `modules/` directory; writing there becomes unsupported.
@@ -120,7 +121,9 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, nor write th
 - **A Monolog recipe copied in each module** (previous version of this proposal). It relies on `%kernel.logs_dir%`, missing in the legacy front-office container, and ignores `PS_LOG_OUTPUT` and `PS_LOG_MAX_FILES`.
 - **A deny list of executable extensions in `files/.htaccess`** (previous version of this proposal). It always ends up missing one, and lets an uploaded `.html` through.
 - **A subfolder per module in `var/logs/`** (`var/logs/<module>/<module>_<env>.log`). It keeps a crowded `var/logs/` tidy, but hosting cleanup jobs, `logrotate` configurations and log collectors (Kubernetes sidecars, Filebeat, Promtail) commonly target `var/logs/*.log` without recursing, so logs in a subfolder risk never being cleaned or collected. The module prefix already groups a module's files, and the rotating handler caps their number.
-- **A flag declaring whether the module's files are deleted on uninstall** (suggested during the review). It would duplicate `uninstall()`, where the module already decides what happens to its tables and configuration; a single place for that decision is easier to follow.
+- **A flag declared by the module, or `removeModuleData()` called in `uninstall()`, to delete its files** (suggested during the review, and previous version of this proposal). Either way the module decides, while the data belongs to the merchant, who already chooses whether the module folder is deleted.
+- **Reusing the existing "delete module folder" option for the data.** Deleting the code to reinstall a clean copy is a common fix, and would then wipe the merchant's data too.
+- **Services only, with no conventions for older cores.** Modules supporting several core versions, the majority, could not adopt the ADR before dropping every older core.
 - **A folder per shop group.** Group membership can change, which would leave a shop's files in the folder of its former group.
 - **Leaving it to the devdocs.** The current paragraph has existed for years without being followed, precisely because it is not a decision and comes with no API.
 
@@ -132,7 +135,9 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, nor write th
 - Logs of every module are found and rotated in one place.
 - Upgrading or removing a module no longer destroys merchant data.
 - Existing modules writing into their own folder keep working but are non-compliant; native modules have to be migrated, each with an upgrade script.
-- Modules write their data through the storage service instead of the PHP file functions. Once 0026 lands, moving private or public data to another storage needs no change in the modules, except where they use `localPath()`.
+- Module developers can adopt the locations today, whatever core they support, and move to the services once their minimum core version provides them.
+- On cores providing them, modules write their data through the storage service instead of the PHP file functions. Once 0026 lands, moving private or public data to another storage needs no change in those modules, except where they use `localPath()`.
+- The merchant, not the module, decides whether a module's data is deleted on uninstall.
 - The core itself still writes into `modules/<module>/`: `Module::_generateConfigXml()` creates the module's `config.xml` when the back office lists the modules. It checks `is_writable()` first, so a read-only `modules/` breaks nothing, but this generated cache has to move to `var/cache/` before a read-only `modules/` is officially supported.
 - A new top-level directory, `files/`, has to be created by the installer and by the upgrade tool, shipped with its `.htaccess`, added to the documented nginx configuration, and mounted as a persistent volume by hosting setups.
 - Feeds, exports and generated assets that modules serve today through a PHP script can be served as static files, which is faster and cacheable by a CDN.
