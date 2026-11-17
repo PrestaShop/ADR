@@ -58,21 +58,14 @@ Writing at runtime into `modules/<module>/` causes concrete problems:
 
 **Cache** is for anything the module can rebuild and that is never served directly: compiled templates, API responses, temporary files of an import. The core may delete it at any time; the module must not rely on it being present.
 
-**Logs** go to `var/logs/`, through a Monolog logger declared in the module's services, named `<module>_<env>.log` (rotating handler, `%kernel.logs_dir%`). A module MUST NOT write logs anywhere else. A module with several channels keeps the module name as prefix (`<module>_api_<env>.log`, `<module>_sync_<env>.log`), so that `<module>_*` always matches all its files. Example:
+**Logs** go to `var/logs/`, through a logger provided by the core. `PrestaShop\PrestaShop\Core\Module\ModuleLoggerFactoryInterface::create(string $moduleName, ?string $channel = null)` returns a PSR-3 logger writing to `<module>_<env>.log`, or `<module>_<channel>_<env>.log` for a module with several channels, so that `<module>_*` always matches all its files. The files go next to the core log (`PS_LOG_OUTPUT`) with the same rotation (`PS_LOG_MAX_FILES`), and the logger works the same in the back office, the front office and the CLI. A module MUST NOT write logs anywhere else, and does not declare its own Monolog handler: `%kernel.logs_dir%` is not defined in the legacy front-office container, where most modules log, and a handler of its own would ignore `PS_LOG_OUTPUT` and `PS_LOG_MAX_FILES`. Example:
 
 ```yaml
 services:
   my_module.logger:
-    class: Monolog\Logger
+    class: Psr\Log\LoggerInterface
+    factory: ['@PrestaShop\PrestaShop\Core\Module\ModuleLoggerFactoryInterface', 'create']
     arguments: ['my_module']
-    calls:
-      - pushHandler: ['@my_module.logger.handler']
-
-  my_module.logger.handler:
-    class: Monolog\Handler\RotatingFileHandler
-    arguments:
-      - '%kernel.logs_dir%/my_module_%kernel.environment%.log'
-      - 10
 ```
 
 **Private data** is everything that must persist but must never be served directly: configuration files, keys, exports, invoices, files uploaded by customers. When such a file has to be downloaded, the module exposes it through a controller that checks the permissions of the requester and streams the file. The web server never serves `var/` directly.
@@ -81,7 +74,7 @@ services:
 
 Since this directory is writable by PHP and served by the web server, the core enforces two rules on it:
 
-- **No script execution.** The core ships a `files/.htaccess` that denies `.php`, `.phtml`, `.phar` and any other extension the server could execute, and sets `X-Content-Type-Options: nosniff`. The documented nginx configuration gets the equivalent rule. A module MUST NOT rely on executing anything from there.
+- **Static types only.** The core ships a `files/.htaccess` built like `img/.htaccess`: everything is denied except a list of static types (the media allowed in `img/`, plus `xml`, `csv`, `json`, `txt`, `pdf`, `xlsx`, `css`, `js`, `woff`, `woff2`). An allow list cannot miss an executable extension the way a deny list does, and it also refuses an uploaded `.html` or `.htm`. Every response carries `X-Content-Type-Options: nosniff` and `Content-Security-Policy: sandbox`, so that an SVG opened directly cannot run its scripts. The documented nginx configuration gets the equivalent rules. A module needing another type asks for it in the core; it does not ship its own `.htaccess`.
 - **Public means public.** A file is placed there only if it can be read by anyone who knows or guesses its URL. Files holding personal or commercial data (order or customer exports, invoices, private feeds) are private data, whatever their format, and are served through a controller that checks permissions.
 
 **Configuration** is not one location but three, depending on who writes it and when:
@@ -94,14 +87,15 @@ Since this directory is writable by PHP and served by the web server, the core e
 
 `upload/` and `download/` remain reserved to the core (product customizations and virtual products); modules MUST NOT write there.
 
-### 3. The core provides the paths, not the module
+### 3. The core provides the storage, not the paths
 
-Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the locations can later move or be backed by another storage (0026) without touching the modules.
+Modules must not build these paths themselves from `_PS_ROOT_DIR_`, nor write their private and public data with `file_put_contents()` and the other PHP file functions: the day a shop keeps these files elsewhere (a shared disk, a bucket, through ADR 0026), every module would have to be rewritten.
 
-- The core exposes a service, `PrestaShop\PrestaShop\Core\Module\ModuleStorageLocatorInterface`, returning for a module name its cache directory, private data directory, public data directory and the public URL of the latter. Directories are created on first access.
-- Each of these methods takes an optional shop ID. Without it, the locator returns the module's root (`<module>/`), for data shared by all shops; with it, a subfolder `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The same code works on a single-shop installation, which simply has one shop ID.
-- The locator also exposes `removeModuleData(string $moduleName)`, deleting the module's private and public data, so that a module wiping its data does not walk the directories itself.
-- The equivalent container parameters (`prestashop.module_cache_dir`, `prestashop.module_data_dir`, `prestashop.module_public_dir`) are available for modules declaring their own services, with the module name appended by the module.
+- **Private and public data are written through the core.** The core exposes a service, `PrestaShop\PrestaShop\Core\Module\ModuleStorageProviderInterface`, returning for a module name its private storage and its public storage. Each storage offers `write()`, `writeStream()`, `read()`, `readStream()`, `exists()`, `delete()` and `listContents()`, on paths relative to the module's location; the public storage adds `publicUrl()`. They are implemented on the local disk (`var/modules/<module>/`, `files/modules/<module>/`) and are backed by the named storages of 0026 once it is accepted, with no change in the modules.
+- **`localPath()` for libraries that need a real file.** Some private files can only be handed to a library as a path, such as client certificates and keys for cURL or OpenSSL. The private storage offers `localPath()`, returning the file itself on the local disk, or a copy in the module's cache directory when the storage is remote. It is the only method that does not carry over to another storage, and is documented as such: a module uses it only when the library leaves no other choice.
+- **The cache keeps a path.** Smarty, GD or Imagick need a real directory, and the cache is local to each node by design. The provider returns the module's cache directory, `var/cache/<env>/modules/<module>/`, created on first access; the container parameter `prestashop.module_cache_dir` is available for modules declaring their own services, with the module name appended by the module.
+- **Shop scope.** Each method of the provider takes an optional shop ID. Without it, it returns the storage of the module's root (`<module>/`), for data shared by all shops; with it, a subfolder `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The same code works on a single-shop installation, which simply has one shop ID.
+- The provider also exposes `removeModuleData(string $moduleName)`, deleting the module's private and public data.
 - Legacy modules reach the same service through `Module::get()` / the container; no new method is added on the `Module` class, since a module already declaring a method with the same name would break (BC promise, ADR 0017).
 
 ### 4. Uninstall and removal
@@ -122,6 +116,9 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 - **`img/modules/<module>/`** (first version of this proposal). `img/` is already served, persisted and restricted to safe types, but only to media: XML feeds, CSV and generated CSS/JS cannot be served from there, and widening `img/.htaccess` would weaken it for the core images too. Keeping media in `img/` and everything else elsewhere would bring back two public locations per module.
 - **A non-guessable public path** (random segment per shop, suggested on PR #34 to avoid revealing installed modules). The module name is already visible in the front office through its assets (`modules/<module>/views/...`) and hook output; obfuscating only the data folder adds a path to store and migrate without hiding anything.
 - **`public/modules/<module>/`** (suggested during the review). Explicit, but `public/` is the web root of a Symfony application: if PrestaShop moves to a dedicated web root one day, the two meanings would collide. `files/` carries no such meaning.
+- **A locator returning the paths of the private and public directories** (previous version of this proposal). It keeps modules on the PHP file functions, so moving these files to another storage would mean rewriting every module again. Only the cache, which needs a real directory, keeps a path.
+- **A Monolog recipe copied in each module** (previous version of this proposal). It relies on `%kernel.logs_dir%`, missing in the legacy front-office container, and ignores `PS_LOG_OUTPUT` and `PS_LOG_MAX_FILES`.
+- **A deny list of executable extensions in `files/.htaccess`** (previous version of this proposal). It always ends up missing one, and lets an uploaded `.html` through.
 - **A subfolder per module in `var/logs/`** (`var/logs/<module>/<module>_<env>.log`). It keeps a crowded `var/logs/` tidy, but hosting cleanup jobs, `logrotate` configurations and log collectors (Kubernetes sidecars, Filebeat, Promtail) commonly target `var/logs/*.log` without recursing, so logs in a subfolder risk never being cleaned or collected. The module prefix already groups a module's files, and the rotating handler caps their number.
 - **A flag declaring whether the module's files are deleted on uninstall** (suggested during the review). It would duplicate `uninstall()`, where the module already decides what happens to its tables and configuration; a single place for that decision is easier to follow.
 - **A folder per shop group.** Group membership can change, which would leave a shop's files in the folder of its former group.
@@ -135,9 +132,11 @@ Modules must not build these paths themselves from `_PS_ROOT_DIR_`, so that the 
 - Logs of every module are found and rotated in one place.
 - Upgrading or removing a module no longer destroys merchant data.
 - Existing modules writing into their own folder keep working but are non-compliant; native modules have to be migrated, each with an upgrade script.
+- Modules write their data through the storage service instead of the PHP file functions. Once 0026 lands, moving private or public data to another storage needs no change in the modules, except where they use `localPath()`.
+- The core itself still writes into `modules/<module>/`: `Module::_generateConfigXml()` creates the module's `config.xml` when the back office lists the modules. It checks `is_writable()` first, so a read-only `modules/` breaks nothing, but this generated cache has to move to `var/cache/` before a read-only `modules/` is officially supported.
 - A new top-level directory, `files/`, has to be created by the installer and by the upgrade tool, shipped with its `.htaccess`, added to the documented nginx configuration, and mounted as a persistent volume by hosting setups.
 - Feeds, exports and generated assets that modules serve today through a PHP script can be served as static files, which is faster and cacheable by a CDN.
 
 ## Open questions
 
-1. **Name of the service and parameters**, to align with the storage names of ADR 0026 (`modules_cache`, `modules_private`, `modules_public`) if it is accepted first.
+1. **Name of the services and of the storage interface**, to align with ADR 0026 if it is accepted first: its storage names (`modules_cache`, `modules_private`, `modules_public`), and its storage interface, which the module storages could expose directly instead of a dedicated one.
