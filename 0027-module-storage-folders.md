@@ -1,4 +1,4 @@
-# 22. Module storage folders
+# 27. Module storage folders
 
 Date: 2026-11-13
 
@@ -6,7 +6,7 @@ Date: 2026-11-13
 
 In discussion
 
-Supersedes the first draft of this ADR ([PR #34](https://github.com/PrestaShop/ADR/pull/34), 2023-05-30) and takes over the review comments left on it.
+Supersedes [0022 - Module storage folders](https://github.com/PrestaShop/ADR/pull/34) (2023-05-30), abandoned, and takes over the review comments left on it.
 
 Related to [0026 - Pluggable file storage](https://github.com/PrestaShop/ADR/pull/46): this ADR defines *where* a module's files live and who owns each location; 0026 defines *through which abstraction* they are read and written. Each location below is meant to become a named storage of 0026 once it is accepted, without changing the rules of this ADR.
 
@@ -94,7 +94,7 @@ On a core that provides the services below, modules must not build these paths t
 - **Private and public data are written through the core.** The core exposes a service, `PrestaShop\PrestaShop\Core\Module\ModuleStorageProviderInterface`, returning for a module name its private storage and its public storage. Each storage offers `write()`, `writeStream()`, `read()`, `readStream()`, `exists()`, `delete()` and `listContents()`, on paths relative to the module's location; the public storage adds `publicUrl()`. They are implemented on the local disk (`var/modules/<module>/`, `files/modules/<module>/`) and are backed by the named storages of 0026 once it is accepted, with no change in the modules.
 - **`localPath()` for libraries that need a real file.** Some private files can only be handed to a library as a path, such as client certificates and keys for cURL or OpenSSL. The private storage offers `localPath()`, returning the file itself on the local disk, or a copy in the module's cache directory when the storage is remote. It is the only method that does not carry over to another storage, and is documented as such: a module uses it only when the library leaves no other choice.
 - **The cache keeps a path.** Smarty, GD or Imagick need a real directory, and the cache is local to each node by design. The provider returns the module's cache directory, `var/cache/<env>/modules/<module>/`, created on first access; the container parameter `prestashop.module_cache_dir` is available for modules declaring their own services, with the module name appended by the module.
-- **Shop scope.** Each method of the provider takes an optional shop ID. Without it, it returns the storage of the module's root (`<module>/`), for data shared by all shops; with it, a subfolder `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The same code works on a single-shop installation, which simply has one shop ID.
+- **Shop scope.** Each method of the provider takes an optional shop ID. Without it, it returns the storage of `<module>/all_shops/`, for data shared by all shops; with it, the storage of `<module>/<id_shop>/`, for data specific to one shop (a feed per shop, a logo per shop). The two are siblings, so the storage of all shops never sees, nor can read, the files of a single shop. The same code works on a single-shop installation, which simply has one shop ID.
 - Legacy modules reach the same service through `Module::get()` / the container; no new method is added on the `Module` class, since a module already declaring a method with the same name would break (BC promise, ADR 0017).
 
 ### 4. Uninstall and removal
@@ -106,7 +106,7 @@ On a core that provides the services below, modules must not build these paths t
 ### 5. Adoption
 
 - The rules apply as soon as this ADR is accepted, as a recommendation for all module developers and as a requirement for native modules, which are migrated one by one.
-- **The locations work on any core version; the services come with the next minor.** A module supporting older cores follows the same locations without the services: cache in `_PS_CACHE_DIR_ . 'modules/<module>/'`, private data in `var/modules/<module>/`, logs in `var/logs/<module>_<env>.log` through its own Monolog handler. It switches to the storage and logger services when the container has them. Public data is the exception, since `files/` and its server rules are shipped by the core: on an older core, a module creating `files/modules/<module>/` copies the core's `files/.htaccess` into it, and nginx hosts have to add the rule themselves.
+- **The locations work on any core version; the services come with the next minor.** A module supporting older cores follows the same locations without the services: cache in `_PS_CACHE_DIR_ . 'modules/<module>/'`, private data in `var/modules/<module>/`, with the same `all_shops/` and `<id_shop>/` subfolders, logs in `var/logs/<module>_<env>.log` through its own Monolog handler. It switches to the storage and logger services when the container has them. Public data is the exception, since `files/` and its server rules are shipped by the core: on an older core, a module creating `files/modules/<module>/` copies the core's `files/.htaccess` into it, and nginx hosts have to add the rule themselves.
 - A module moving existing data out of its own folder does it in an upgrade script, so that merchants do not lose files.
 - The devdocs good-practices page is rewritten from this ADR, and the PrestaShop Addons validator can flag runtime writes into `modules/`.
 - From the next major version, the project officially supports a read-only `modules/` directory; writing there becomes unsupported.
@@ -124,7 +124,8 @@ On a core that provides the services below, modules must not build these paths t
 - **A flag declared by the module, or `removeModuleData()` called in `uninstall()`, to delete its files** (suggested during the review, and previous version of this proposal). Either way the module decides, while the data belongs to the merchant, who already chooses whether the module folder is deleted.
 - **A second option in the uninstall confirmation, only for the data** (previous version of this proposal). It was meant to keep the data when the module folder is deleted to reinstall a clean copy, but most modules already drop their tables on uninstall, so the files kept would mostly be orphans. A second checkbox adds a choice the merchant may not understand, while disabling the module already keeps everything.
 - **Services only, with no conventions for older cores.** Modules supporting several core versions, the majority, could not adopt the ADR before dropping every older core.
-- **A folder per shop group.** Group membership can change, which would leave a shop's files in the folder of its former group.
+- **The module root for data shared by all shops** (previous version of this proposal). The shop folders would sit inside it, so the storage of all shops could read the files of every single shop.
+- **A folder per shop group** (suggested during the review). Group membership can change, which would leave a shop's files in the folder of its former group.
 - **Leaving it to the devdocs.** The current paragraph has existed for years without being followed, precisely because it is not a decision and comes with no API.
 
 ## Consequences
@@ -133,7 +134,7 @@ On a core that provides the services below, modules must not build these paths t
 - An operator knows which directories to persist and share between nodes: `img/`, `upload/`, `download/`, `files/`, `var/modules/`. `var/cache/` stays local to each node, `modules/` can ship read-only in the image.
 - Backups and environment synchronisation can exclude cache and logs as a whole.
 - Logs of every module are found and rotated in one place.
-- Upgrading or removing a module no longer destroys merchant data.
+- Upgrading or removing a module no longer destroys merchant data. It becomes safe to move the module folder away before applying the new version, so that the files removed in the newer version are cleaned up ([autoupgrade#1571](https://github.com/PrestaShop/autoupgrade/issues/1571)).
 - Existing modules writing into their own folder keep working but are non-compliant; native modules have to be migrated, each with an upgrade script.
 - Module developers can adopt the locations today, whatever core they support, and move to the services once their minimum core version provides them.
 - On cores providing them, modules write their data through the storage service instead of the PHP file functions. Once 0026 lands, moving private or public data to another storage needs no change in those modules, except where they use `localPath()`.
