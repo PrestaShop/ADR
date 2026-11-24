@@ -42,10 +42,11 @@ To learn more about ADRs, read [this article][adr].
 | 0019   | 2022-11-16 | -                    | [FQCN Autowiring][0019]                                                           | ✅ Accepted       |
 | 0020   | 2023-02-22 | -                    | [Module versioning when min compat with the core is updated][0020]                | ✅ Accepted       |
 | 0021   | 2023-10-27 | -                    | [Model and Repositories aiming to replace the usages of legacy ObjectModel][0021] | ❌ Rejected       |
-| 0022   | 2023-05-30 | [Pull Request][0022] | [Module storage folders][0022]                                                    | 💬 In discussion |
+| 0022   | 2023-05-30 | [Pull Request][0022] | [Module storage folders][0022]                                                    | ❌ Abandoned      |
 | 0023   | 2023-10-27 | -                    | [CQRS API quidelines][0023]                                                       | ✅ Accepted       |
 | 0024   | 2023-10-27 | -                    | [Refactoring of PrestaShop context][0024]                                         | ✅ Accepted       |
 | 0025   | 2023-10-27 | [Pull Request][0025] | [Doctrine entities migration][0025]                                               | 💬 In discussion |
+| 0027   | 2026-11-13 | [Pull Request][0027] | [Module storage folders][0027]                                                    | ✅ Accepted       |
 
 [adr]: http://thinkrelevance.com/blog/2011/11/15/documenting-architecture-decisions
 [adr-tools]: https://github.com/npryce/adr-tools/
@@ -73,3 +74,4 @@ To learn more about ADRs, read [this article][adr].
 [0023]: 0023-cqrs-api-guidelines.md
 [0024]: https://github.com/PrestaShop/ADR/pull/36
 [0025]: https://github.com/PrestaShop/ADR/pull/37
+[0027]: 0027-module-storage-folders.md
