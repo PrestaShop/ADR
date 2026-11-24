@@ -8,7 +8,7 @@ Accepted
 
 Supersedes [0022 - Module storage folders](https://github.com/PrestaShop/ADR/pull/34) (2023-05-30), abandoned, and takes over the review comments left on it.
 
-Related to [0026 - Pluggable file storage](https://github.com/PrestaShop/ADR/pull/46): this ADR defines *where* a module's files live and who owns each location; 0026 defines *through which abstraction* they are read and written. Each location below is meant to become a named storage of 0026 once it is accepted, without changing the rules of this ADR.
+Related to [0026 - Pluggable file storage](0026-pluggable-file-storage.md): this ADR defines *where* a module's files live and who owns each location; 0026 defines *through which abstraction* they are read and written. Each location below is meant to become a named storage of 0026 once it is accepted, without changing the rules of this ADR.
 
 ## Context
 
@@ -146,3 +146,5 @@ On a core that provides the services below, modules must not build these paths t
 ## Open questions
 
 1. **Name of the services and of the storage interface**, to align with ADR 0026 if it is accepted first: its storage names (`modules_cache`, `modules_private`, `modules_public`), and its storage interface, which the module storages could expose directly instead of a dedicated one.
+
+   Answered by [0026](0026-pluggable-file-storage.md), section 4: the module storages are its `modules_private` and `modules_public` storages scoped to `<module>/`, exposed as its `StorageInterface` (`fileExists()` and `listFiles()` instead of `exists()` and `listContents()`). The cache keeps a path and has no storage.
