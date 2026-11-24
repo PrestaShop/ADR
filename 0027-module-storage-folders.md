@@ -4,7 +4,7 @@ Date: 2026-11-13
 
 ## Status
 
-In discussion
+Accepted
 
 Supersedes [0022 - Module storage folders](https://github.com/PrestaShop/ADR/pull/34) (2023-05-30), abandoned, and takes over the review comments left on it.
 
@@ -105,10 +105,11 @@ On a core that provides the services below, modules must not build these paths t
 
 ### 5. Adoption
 
-- The rules apply as soon as this ADR is accepted, as a recommendation for all module developers and as a requirement for native modules, which are migrated one by one.
+- The rules apply as soon as this ADR is accepted, as a recommendation for all module developers.
+- **Native modules are migrated in the next major version.** Moving their files out of `modules/<module>/` is a BC break: a theme overriding a native module's templates, with paths to its images for example (`ps_banner`, `ps_imageslider`, `blockreassurance`), would stop working.
 - **The locations work on any core version; the services come with the next minor.** A module supporting older cores follows the same locations without the services: cache in `_PS_CACHE_DIR_ . 'modules/<module>/'`, private data in `var/modules/<module>/`, logs in `var/logs/<module>_<env>.log` through its own Monolog handler. It switches to the storage and logger services when the container has them. Public data is the exception, since `files/` and its server rules are shipped by the core: on an older core, a module creating `files/modules/<module>/` copies the core's `files/.htaccess` into it, and nginx hosts have to add the rule themselves.
 - A module moving existing data out of its own folder does it in an upgrade script, so that merchants do not lose files.
-- The devdocs good-practices page is rewritten from this ADR, and the PrestaShop Addons validator can flag runtime writes into `modules/`.
+- The devdocs good-practices page is rewritten from this ADR, and from the next major version the PrestaShop Addons validator enforces the rules on third-party modules, flagging runtime writes into `modules/`.
 - From the next major version, the project officially supports a read-only `modules/` directory; writing there becomes unsupported.
 
 ## Options considered and rejected
@@ -134,7 +135,7 @@ On a core that provides the services below, modules must not build these paths t
 - Backups and environment synchronisation can exclude cache and logs as a whole.
 - Logs of every module are found and rotated in one place.
 - Upgrading or removing a module no longer destroys merchant data. It becomes safe to move the module folder away before applying the new version, so that the files removed in the newer version are cleaned up ([autoupgrade#1571](https://github.com/PrestaShop/autoupgrade/issues/1571)).
-- Existing modules writing into their own folder keep working but are non-compliant; native modules have to be migrated, each with an upgrade script.
+- Existing modules writing into their own folder keep working but are non-compliant; native modules are migrated in the next major version, each with an upgrade script.
 - Module developers can adopt the locations today, whatever core they support, and move to the services once their minimum core version provides them.
 - On cores providing them, modules write their data through the storage service instead of the PHP file functions. Once 0026 lands, moving private or public data to another storage needs no change in those modules, except where they use `localPath()`.
 - The merchant, not the module, decides whether a module's data is deleted on uninstall.
