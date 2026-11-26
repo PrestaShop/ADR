@@ -16,7 +16,7 @@ To learn more about ADRs, read [this article][adr].
 
 3) Once the discussion is over and after all necessary ADR modifications, a vote is cast in the related Pull Request.
 
-4) All project maintainers vote, and their vote is registered. Decisions are accepted by simple majority. Discussed ADRs are merged even if they are not accepted.
+4) The members of the product and tech councils vote, and their vote is registered. Decisions are accepted by simple majority. Discussed ADRs are merged even if they are not accepted.
 
 ## ADR status
 
